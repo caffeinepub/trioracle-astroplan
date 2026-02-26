@@ -1,0 +1,63 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-25T17:49:08.097Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 3,
+    "implemented": 2,
+    "items": [
+      {
+        "id": "REQ-32",
+        "summary": "Add a Seed Number numeric input field (valid range: 1–249, inclusive) to the One Question service booking form in BookingForm.tsx. The field must be clearly labelled 'Seed Number', accept only integer values between 1 and 249, and its value must be submitted alongside all other inquiry fields when the form is sent.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/BookingForm.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/BookingForm.tsx"
+        ]
+      },
+      {
+        "id": "REQ-33",
+        "summary": "Update the backend Inquiry data type in backend/main.mo to add an optional seedNumber field (e.g. seedNumber: ?Nat) to the Inquiry record. Update the submitInquiry function to accept and persist this field. Ensure full backward compatibility so that existing inquiries without a seed number are unaffected.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-34",
+        "summary": "Update InquiriesTab.tsx in the Admin Dashboard to display the Seed Number field for One Question service inquiries. Show the seed number alongside the other inquiry details (service type, visitor name, DOB, question, etc.) for any inquiry where a seed number was submitted.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/InquiriesTab.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/InquiriesTab.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/BookingForm.tsx",
+    "frontend/src/components/InquiriesTab.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

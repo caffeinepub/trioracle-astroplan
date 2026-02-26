@@ -1,0 +1,26 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-25T17:49:08.094Z",
+  "summary": "All three requirements (REQ-32, REQ-33, REQ-34) appear to be implemented in the diff. The backend Inquiry type gains an optional seedNumber field with migration support, the BookingForm adds a validated Seed Number field for the One Question service, and InquiriesTab displays the seed number for relevant inquiries.",
+  "missing_requirements": [],
+  "hallucinated_features": [
+    {
+      "description": "A backend/migration.mo file was added to handle data migration from OldInquiry (without seedNumber) to NewInquiry (with seedNumber), including OldActor/NewActor type definitions and a run() migration function.",
+      "reason": "REQ-33 only requested backward compatibility and an optional field — it did not request a formal migration module file. While this supports the backward compatibility goal, it is an additional implementation artifact not explicitly requested.",
+      "evidence": [
+        "backend/migration.mo"
+      ]
+    }
+  ],
+  "confidence": 0.82,
+  "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/components/BookingForm.tsx",
+    "frontend/src/components/InquiriesTab.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "project_state.json"
+  ]
+}

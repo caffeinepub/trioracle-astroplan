@@ -1,0 +1,40 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Add Seed Number field to One Question service booking form",
+  "requirements": [
+    {
+      "id": "REQ-32",
+      "summary": "Add a Seed Number numeric input field (valid range: 1–249, inclusive) to the One Question service booking form in BookingForm.tsx. The field must be clearly labelled, accept only integers between 1 and 249, and be submitted alongside all other inquiry fields.",
+      "acceptanceCriteria": [
+        "The One Question service booking form contains a labelled 'Seed Number' field.",
+        "The field only accepts integer values between 1 and 249 inclusive (validation prevents submission outside this range).",
+        "The seed number value is submitted with the inquiry when the form is submitted.",
+        "No other service booking forms are affected by this change."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/BookingForm.tsx",
+          "operation": "modify",
+          "description": "Add a 'Seed Number' numeric input field with range validation (1-249 inclusive) to the One Question service booking form. The field should be conditionally rendered only when the selected service is 'One Question' (serviceId 4). Add local state for seedNumber, implement integer validation that prevents non-numeric input and enforces the 1-249 range, and include the seedNumber value in the submitInquiry mutation payload when the form is submitted. Use styling consistent with existing form fields (birthCountry, birthCity, birthState pattern)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-34",
+      "summary": "Update InquiriesTab.tsx in the Admin Dashboard to display the Seed Number field for One Question service inquiries where a seed number was submitted.",
+      "acceptanceCriteria": [
+        "Admin Dashboard Inquiries tab shows a 'Seed Number' field for One Question inquiries that have one.",
+        "The seed number is clearly labelled and displayed alongside existing inquiry fields.",
+        "Inquiries from other service types that do not have a seed number are not affected."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/InquiriesTab.tsx",
+          "operation": "modify",
+          "description": "Add display logic to show the 'Seed Number' field for inquiries where seedNumber is present (check inquiry.seedNumber is not null/undefined). Render the seed number value alongside existing inquiry details like service type, visitor name, DOB, and question. Use conditional rendering so that only inquiries with a seed number show this field. Apply consistent styling with the existing inquiry detail fields."
+        }
+      ]
+    }
+  ]
+}

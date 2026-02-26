@@ -1,0 +1,45 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-add-a-seed-number-numeric-input-field-valid-range-1-249-inclusive-to-the-one-question-service-booking-form-in-bookingform-tsx-the-field-must-be-clearly-labelled-seed-number-accept-only-integer-values-between-1-and-249-and-its-value-must-be-submitted-alongside-all-other-inquiry-fields-when-the-form-is-sent",
+      "featureTitle": "Add a Seed Number numeric input field (valid range: 1–249, inclusive) to the One Question service booking form in BookingForm.tsx. The field must be clearly labelled 'Seed Number', accept only integer values between 1 and 249, and its value must be submitted alongside all other inquiry fields when the form is sent.",
+      "files": [
+        "frontend/src/components/BookingForm.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-32"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-inquiriestab-tsx-in-the-admin-dashboard-to-display-the-seed-number-field-for-one-question-service-inquiries-show-the-seed-number-alongside-the-other-inquiry-details-service-type-visitor-name-dob-question-etc-for-any-inquiry-where-a-seed-number-was-submitted",
+      "featureTitle": "Update InquiriesTab.tsx in the Admin Dashboard to display the Seed Number field for One Question service inquiries. Show the seed number alongside the other inquiry details (service type, visitor name, DOB, question, etc.) for any inquiry where a seed number was submitted.",
+      "files": [
+        "frontend/src/components/InquiriesTab.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-34"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

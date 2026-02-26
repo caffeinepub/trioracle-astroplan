@@ -1,0 +1,417 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 19,
+  "summary": "TriOracle by Astroplam astrology website with three main sections: Courses, Services, and Blog/Notice Board. Features 4 courses (Predictive Nadi Astrology ₹10,000, Advanced Numerology ₹17,500, Mystery of Palmistry ₹15,000, Nadi Cards ₹5,000) with full syllabuses. Services section with 6 services including Gemstone Consultation (₹500), all with pricing and booking/inquiry forms. New 'Special Unique Service' section (placed before existing Services) with a single combined description about predicting nature via palmistry/numerology and advising on future problems (financials, relationships, family), featuring two service cards: Video Prediction (₹2,500) and Written Prediction (₹2,500), each with a booking form collecting name, email, DOB, time of birth (24hr), place of birth (State/Country/City), multi-file upload (up to 5 palm photos), special question, and past life events notes. Blog managed by admin (Internet Identity login). Comparison table (Astrology/Numerology/Palmistry) at page bottom. Light, modern, spiritual color palette.",
+  "architectural_notes": [
+    "Form submissions (DOB, questions, past life notes, hand pictures) are saved in the system database and viewable in the admin dashboard — no direct email sending",
+    "Admin blog management and dashboard access via Internet Identity login"
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-build-a-responsive-multi-section-single-page-website-for-trioracle-astroplan-the-site-must-have-a-sticky-header-with-the-logo-brand-name-trioracle-astroplan-and-navigation-links-that-scroll-to-courses-services-blog-and-contact-footer-sections-apply-a-light-modern-spiritual-design-theme-soft-cream-ivory-backgrounds-muted-gold-c9a84c-and-sage-green-7a9e7e-accents-gentle-lavender-highlights-d6ceea-clean-sans-serif-typography-e-g-inter-or-similar-subtle-celestial-mandala-decorative-elements-and-no-overly-bold-or-saturated-colors",
+      "title": "Build a responsive multi-section single-page website for TriOracle / AstroPlan. The site must have a sticky header with the logo/brand name 'TriOracle – AstroPlan' and navigation links that scroll to Courses, Services, Blog, and Contact/Footer sections. Apply a light, modern, spiritual design theme: soft cream/ivory backgrounds, muted gold (#C9A84C) and sage green (#7A9E7E) accents, gentle lavender highlights (#D6CEEA), clean sans-serif typography (e.g. Inter or similar), subtle celestial/mandala decorative elements, and no overly bold or saturated colors.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-the-courses-section-with-four-course-cards-each-card-has-course-name-fee-in-indian-rupees-a-collapsed-expandable-syllabus-section-the-four-courses-are-1-predictive-nadi-astrology-10-000-syllabus-covers-rules-of-nadi-astrology-ayanamsa-nirayana-bhava-chalit-dasa-sub-lord-aspects-conjunctions-position-lordship-of-planets-how-to-judge-a-planet-strength-of-planet-cusps-results-of-planets-timing-of-an-event-transits-negation-education-houses-planets-combination-foreign-education-scholarships-competition-exams-field-of-education-prizes-litigation-houses-planets-combinations-timing-imprisonment-kidnapping-winning-property-vehicle-purchase-houses-planets-timing-transits-loan-location-commercial-construction-rental-loss-partition-sale-vehicle-houses-facilitator-timing-colour-luxury-commercial-theft-sale-marriage-timing-love-types-kundali-milan-divorce-manglik-gun-milan-childbirth-timing-twin-adoption-custody-gender-health-timing-chronic-surgery-improvement-type-longevity-timing-death-contexts-travel-visa-for-us-europe-canada-australia-nz-pr-work-visa-citizenship-purpose-professional-career-getting-job-change-transfer-business-foreign-job-govt-job-prasna-jyotish-specific-questions-same-day-events-mundane-questions-remedies-vastu-name-correction-mantra-tantra-yantra-graphology-meditation-yoga-fasting-daan-pooja-hawan-pilgrimage-muhurat-marriage-grah-pravesh-birth-time-correction-2-advanced-numerology-17-500-syllabus-covers-study-of-numerology-for-predictive-purpose-nature-of-a-person-anxiety-depression-drug-addict-drunkard-overconfident-miser-spendthrift-combination-of-cheat-conman-sex-scandal-vs-financial-scandal-differentiation-debts-bankruptcy-litigation-differentiation-hindu-dasa-system-vimshottari-dasa-mahadasa-antar-dasa-pratyantar-dasa-calculation-name-correction-combinations-of-billionaires-high-end-actors-actresses-leaders-dictators-respectful-children-builders-property-buyers-speculators-share-market-casino-winners-management-travel-visa-pr-green-card-settlement-true-lover-vs-cheat-merging-numerology-with-nadi-astrology-3-mystery-of-palmistry-15-000-syllabus-covers-palmistry-predictive-course-panchtattva-and-human-evolution-shape-of-hands-earth-water-fire-air-fingers-jupiter-saturn-sun-mercury-thumb-mounts-venus-lower-mars-upper-mars-neptune-moon-sun-saturn-jupiter-mercury-finger-prints-earth-water-fire-air-mix-composite-major-lines-earth-water-fire-air-minor-influence-lines-girdle-of-venus-via-lasciva-moon-line-ambition-line-sun-line-passion-line-mercury-line-mars-line-axe-lines-relationship-children-medical-stigmata-predictive-techniques-for-timing-nails-shape-colour-signs-thickness-signs-star-cross-squares-tridents-triangle-bars-black-spots-solomon-ring-grill-temple-skin-patterns-raja-loop-seriousness-loops-bee-career-academics-self-discovery-compatibility-marriage-friendship-medical-palmistry-depression-bp-ibs-diabetes-eye-sight-allergy-ent-lipid-profile-metabolism-lungs-travel-and-immigration-litigation-miscellaneous-marriage-divorce-children-sexual-behaviour-infertility-career-business-financial-4-nadi-cards-5-000-syllabus-covers-introduction-to-vedic-cards-red-blue-yellow-general-interpretation-timing-of-marriage-type-of-in-laws-love-affairs-divorce-child-birth-property-purchase-landed-construction-education-health-type-and-timing-of-disease-timing-of-death-profession-up-down-job-promotion-type-litigation-win-jail-bail-travel-visa-pr-citizenship-timing-miscellaneous-win-loss-in-matches-speculation-lost-and-found",
+      "title": "Build the Courses section with four course cards. Each card has: course name, fee in Indian Rupees, a collapsed/expandable syllabus section. The four courses are: (1) Predictive Nadi Astrology — ₹10,000 — syllabus covers Rules of Nadi Astrology (Ayanamsa, Nirayana Bhava Chalit, Dasa, Sub lord, Aspects & Conjunctions, Position & Lordship of Planets, How to Judge a Planet, Strength of Planet, Cusps, Results of Planets, Timing of an Event, Transits, Negation), Education (Houses, Planets, Combination, Foreign Education, Scholarships, Competition Exams, Field of Education, Prizes), Litigation (Houses, Planets, Combinations & Timing, Imprisonment, Kidnapping, Winning), Property & Vehicle (Purchase, Houses, Planets, Timing, Transits, Loan, Location, Commercial, Construction, Rental, Loss, Partition, Sale; Vehicle: Houses, Facilitator, Timing, Colour, Luxury, Commercial, Theft, Sale), Marriage (Timing, Love types, Kundali Milan, Divorce, Manglik, Gun Milan), Childbirth (Timing, Twin, Adoption, Custody, Gender), Health (Timing, Chronic, Surgery, Improvement, Type), Longevity (Timing, Death contexts), Travel (Visa for US/Europe/Canada/Australia/NZ, PR, Work Visa, Citizenship, Purpose), Professional Career (Getting job, Change, Transfer, Business, Foreign job, Govt job), Prasna Jyotish (Specific questions, Same-day events, Mundane questions), Remedies (Vastu, Name correction, Mantra, Tantra, Yantra, Graphology, Meditation, Yoga, Fasting, Daan, Pooja, Hawan, Pilgrimage), Muhurat (Marriage, Grah Pravesh), Birth time correction; (2) Advanced Numerology — ₹17,500 — syllabus covers Study of Numerology for predictive purpose, Nature of a person (Anxiety, depression, drug addict, drunkard, Overconfident, Miser, Spendthrift), Combination of cheat/Conman, Sex scandal vs financial scandal differentiation, Debts/bankruptcy/litigation differentiation, Hindu Dasa System (Vimshottari Dasa, Mahadasa, Antar Dasa, Pratyantar Dasa, calculation), Name Correction, Combinations of Billionaires, High-end Actors/Actresses, Leaders, Dictators, Respectful children, Builders/property buyers, Speculators/share market/casino winners, Management, Travel (Visa, PR, Green Card, settlement), True lover vs Cheat, Merging Numerology with Nadi Astrology; (3) Mystery of Palmistry — ₹15,000 — syllabus covers Palmistry predictive course, Panchtattva and human evolution, Shape of hands (Earth, Water, Fire, Air), Fingers (Jupiter, Saturn, Sun, Mercury, Thumb), Mounts (Venus, Lower Mars, Upper Mars, Neptune, Moon, Sun, Saturn, Jupiter, Mercury), Finger Prints (Earth, Water, Fire, Air, Mix, Composite), Major Lines (Earth, Water, Fire, Air), Minor & Influence Lines (Girdle of Venus, Via Lasciva, Moon Line, Ambition Line, Sun line, Passion Line, Mercury Line, Mars line, Axe lines, Relationship, Children, Medical Stigmata), Predictive Techniques for timing, Nails (Shape, Colour, Signs, Thickness), Signs (Star, Cross, Squares, Tridents, Triangle, Bars, Black spots, Solomon Ring, Grill, Temple), Skin Patterns (Raja loop, Seriousness Loops, Bee), Career & Academics Self Discovery, Compatibility (Marriage, Friendship), Medical Palmistry (Depression, BP, IBS, Diabetes, Eye-Sight, Allergy, ENT, Lipid Profile, Metabolism, Lungs), Travel and immigration, Litigation, Miscellaneous (Marriage, Divorce, Children, Sexual Behaviour, Infertility, Career, Business, Financial); (4) Nadi Cards — ₹5,000 — syllabus covers Introduction to Vedic cards (Red, Blue, Yellow), General interpretation, Timing of Marriage/Type of in-laws/Love affairs/Divorce, Child birth, Property purchase (Landed, Construction), Education, Health (Type and Timing of disease), Timing of death, Profession (Up/down, Job, Promotion, Type), Litigation (win, jail, bail), Travel (Visa, PR, Citizenship, Timing), Miscellaneous (Win/loss in matches, Speculation, Lost and found).",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-the-services-section-listing-all-five-services-with-their-fees-and-a-booking-inquiry-form-per-service-services-1-one-question-500-2-matchmaking-kundali-milan-with-numerology-astrology-new-method-no-manglik-yog-1-500-3-muhurat-1-500-4-professional-advice-professional-growth-1-100-5-personal-phone-consultation-2-500-each-service-card-shows-the-service-name-short-description-and-fee-with-a-book-inquire-button-that-opens-an-inline-form-or-modal-collecting-visitor-name-email-date-of-birth-date-picker-service-specific-question-or-details-past-life-event-notes-textarea-and-hand-picture-upload-image-file-on-submission-call-the-backend-submitinquiry-function-to-store-the-data-show-a-success-confirmation-message-after-submission",
+      "title": "Build the Services section listing all five services with their fees and a booking/inquiry form per service. Services: (1) One Question — ₹500; (2) Matchmaking (Kundali Milan with Numerology/Astrology, new method, no Manglik Yog) — ₹1,500; (3) Muhurat — ₹1,500; (4) Professional Advice / Professional Growth — ₹1,100; (5) Personal Phone Consultation — ₹2,500. Each service card shows the service name, short description, and fee, with a 'Book / Inquire' button that opens an inline form or modal collecting: visitor name, email, date of birth (date picker), service-specific question or details, past life event notes (textarea), and hand picture upload (image file). On submission, call the backend submitInquiry function to store the data. Show a success confirmation message after submission.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-the-blog-notice-board-section-public-visitors-see-a-list-of-published-blog-posts-with-title-author-date-and-content-truncated-with-read-more-expand-admin-users-authenticated-via-internet-identity-verified-against-the-backend-isadmin-function-see-additional-controls-new-post-button-and-edit-delete-publish-buttons-on-each-post-the-blog-management-ui-allows-the-admin-to-create-a-new-post-title-rich-text-or-multiline-content-edit-an-existing-post-toggle-published-unpublished-status-and-delete-a-post-all-changes-are-persisted-via-the-backend-blog-functions",
+      "title": "Build the Blog / Notice Board section. Public visitors see a list of published blog posts with title, author, date, and content (truncated with 'Read More' expand). Admin users (authenticated via Internet Identity, verified against the backend isAdmin function) see additional controls: 'New Post' button, and Edit/Delete/Publish buttons on each post. The blog management UI allows the admin to: create a new post (title + rich text or multiline content), edit an existing post, toggle published/unpublished status, and delete a post. All changes are persisted via the backend blog functions.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-an-admin-dashboard-page-accessible-only-when-logged-in-as-an-admin-via-internet-identity-the-dashboard-displays-two-tabs-or-sections-1-inquiries-a-table-or-card-list-of-all-submitted-inquiries-showing-service-type-visitor-name-dob-question-past-life-notes-and-a-thumbnail-preview-of-the-uploaded-hand-picture-with-an-option-to-view-full-size-2-blog-management-a-list-of-all-posts-published-and-drafts-with-inline-edit-publish-toggle-and-delete-actions-add-a-login-logout-button-in-the-header-that-uses-internet-identity-when-logged-in-as-admin-a-link-to-the-admin-dashboard-appears-in-the-header",
+      "title": "Build an Admin Dashboard page (accessible only when logged in as an admin via Internet Identity). The dashboard displays two tabs or sections: (1) Inquiries — a table or card list of all submitted inquiries showing service type, visitor name, DOB, question, past life notes, and a thumbnail/preview of the uploaded hand picture with an option to view full size; (2) Blog Management — a list of all posts (published and drafts) with inline edit, publish toggle, and delete actions. Add a login/logout button in the header that uses Internet Identity. When logged in as admin, a link to the Admin Dashboard appears in the header.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-full-width-comparison-table-section-near-the-bottom-of-the-page-above-the-footer-titled-how-we-read-your-life-or-similar-the-table-has-rows-for-each-life-aspect-and-columns-for-astrology-numerology-and-palmistry-populate-with-the-following-data-exactly-marriage-astrology-timing-love-affairs-divorce-numerology-cheating-multiple-affairs-family-dynamics-palmistry-instincts-lgbtq-relationship-dynamics-property-astrology-sale-purchase-loss-natural-disasters-numerology-cheating-legal-issues-documentation-palmistry-timing-of-purchase-travel-astrology-long-distance-numerology-visa-settlement-return-palmistry-settlement-abroad-health-astrology-chronic-diseases-surgery-numerology-minor-issues-timing-of-ailments-palmistry-health-indicators-childbirth-astrology-conception-pregnancy-delivery-numerology-abortions-palmistry-childlessness-education-astrology-type-marks-numerology-type-palmistry-learning-abilities-career-astrology-type-success-failure-numerology-career-fluctuations-palmistry-skill-assessment-litigation-astrology-timing-outcome-numerology-legal-issues-support-for-outcomes-palmistry-indicators-for-legal-troubles",
+      "title": "Add a full-width comparison table section near the bottom of the page (above the footer) titled 'How We Read Your Life' or similar. The table has rows for each life aspect and columns for Astrology, Numerology, and Palmistry. Populate with the following data exactly: Marriage — Astrology: Timing, Love Affairs, Divorce | Numerology: Cheating, Multiple Affairs, Family Dynamics | Palmistry: Instincts, LGBTQ, Relationship Dynamics; Property — Astrology: Sale/Purchase, Loss, Natural Disasters | Numerology: Cheating, Legal Issues, Documentation | Palmistry: Timing of Purchase; Travel — Astrology: Long Distance | Numerology: Visa, Settlement, Return | Palmistry: Settlement Abroad; Health — Astrology: Chronic Diseases, Surgery | Numerology: Minor Issues, Timing of Ailments | Palmistry: Health Indicators; Childbirth — Astrology: Conception, Pregnancy, Delivery | Numerology: Abortions | Palmistry: Childlessness; Education — Astrology: Type, Marks | Numerology: Type | Palmistry: Learning Abilities; Career — Astrology: Type, Success/Failure | Numerology: Career Fluctuations | Palmistry: Skill Assessment; Litigation — Astrology: Timing, Outcome | Numerology: Legal Issues, Support for Outcomes | Palmistry: Indicators for Legal Troubles.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-consistent-light-modern-spiritual-visual-theme-across-the-entire-site-use-a-soft-cream-ivory-primary-background-faf7f2-or-similar-muted-gold-c9a84c-for-headings-and-accent-borders-sage-green-7a9e7e-for-buttons-and-highlights-gentle-lavender-d6ceea-for-card-backgrounds-or-section-dividers-and-deep-charcoal-2c2c2c-for-body-text-use-a-clean-sans-serif-font-for-body-text-and-an-elegant-serif-or-display-font-for-section-headings-include-subtle-celestial-mandala-svg-decorative-elements-in-section-backgrounds-all-interactive-elements-buttons-cards-have-smooth-hover-transitions-footer-includes-brand-name-tagline-and-navigation-links",
+      "title": "Apply a consistent light, modern, spiritual visual theme across the entire site. Use a soft cream/ivory primary background (#FAF7F2 or similar), muted gold (#C9A84C) for headings and accent borders, sage green (#7A9E7E) for buttons and highlights, gentle lavender (#D6CEEA) for card backgrounds or section dividers, and deep charcoal (#2C2C2C) for body text. Use a clean sans-serif font for body text and an elegant serif or display font for section headings. Include subtle celestial/mandala SVG decorative elements in section backgrounds. All interactive elements (buttons, cards) have smooth hover transitions. Footer includes brand name, tagline, and navigation links.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-brand-name-to-trioracle-by-astroplam-everywhere-on-the-site-the-sticky-header-logo-brand-text-the-page-title-in-index-html-the-footer-brand-name-and-any-other-location-where-the-previous-name-trioracle-astroplan-or-trioracle-by-astroplan-appears",
+      "title": "Update the brand name to 'TriOracle by Astroplam' everywhere on the site: the sticky header logo/brand text, the page <title> in index.html, the footer brand name, and any other location where the previous name ('TriOracle – AstroPlan' or 'TriOracle by Astroplan') appears.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-the-nadi-cards-course-syllabus-inside-coursessection-change-the-text-introduction-to-vedic-cards-red-blue-yellow-to-introduction-to-nadi-cards-red-blue-yellow",
+      "title": "In the Nadi Cards course syllabus inside CoursesSection, change the text 'Introduction to Vedic cards (Red, Blue, Yellow)' to 'Introduction to Nadi Cards (Red, Blue, Yellow)'.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-time-of-birth-field-in-24-hour-hh-mm-format-alongside-the-date-of-birth-field-in-the-booking-inquiry-forms-for-all-five-services-one-question-matchmaking-muhurat-professional-advice-personal-phone-consultation-the-time-field-must-use-a-time-input-or-text-input-constrained-to-hh-mm-24-hour-format-and-must-be-submitted-along-with-the-dob-when-the-form-is-sent",
+      "title": "Add a time of birth field in 24-hour HH:MM format alongside the date of birth field in the booking/inquiry forms for all five services (One Question, Matchmaking, Muhurat, Professional Advice, Personal Phone Consultation). The time field must use a time input or text input constrained to HH:MM 24-hour format and must be submitted along with the DOB when the form is sent.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-split-the-matchmaking-service-booking-form-into-two-identical-clearly-labelled-sections-person-1-and-person-2-each-section-must-collect-full-name-email-address-date-of-birth-date-picker-and-time-of-birth-24-hour-hh-mm-format-both-sections-must-be-visible-simultaneously-within-the-same-form-modal-and-all-eight-field-values-must-be-submitted-together-when-the-form-is-sent",
+      "title": "Split the Matchmaking service booking form into two identical, clearly labelled sections — 'Person 1' and 'Person 2'. Each section must collect: full name, email address, date of birth (date picker), and time of birth (24-hour HH:MM format). Both sections must be visible simultaneously within the same form/modal, and all eight field values must be submitted together when the form is sent.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-header-tsx-apply-font-bold-or-equivalent-bold-font-weight-class-to-the-trioracle-by-astroplam-brand-name-text-so-it-renders-in-bold-in-the-sticky-header",
+      "title": "In frontend/src/components/Header.tsx, apply font-bold (or equivalent bold font-weight class) to the 'TriOracle by Astroplam' brand name text so it renders in bold in the sticky header.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-footer-tsx-apply-font-bold-or-equivalent-bold-font-weight-class-to-the-trioracle-by-astroplam-brand-name-text-so-it-renders-in-bold-in-the-footer",
+      "title": "In frontend/src/components/Footer.tsx, apply font-bold (or equivalent bold font-weight class) to the 'TriOracle by Astroplam' brand name text so it renders in bold in the footer.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-scan-all-other-frontend-components-and-files-e-g-herosection-any-title-text-for-any-additional-occurrences-of-the-brand-name-trioracle-by-astroplam-and-ensure-those-are-also-rendered-in-bold",
+      "title": "Scan all other frontend components and files (e.g. HeroSection, any title text) for any additional occurrences of the brand name 'TriOracle by Astroplam' and ensure those are also rendered in bold.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-search-all-frontend-components-and-files-for-any-occurrences-of-star-number-plam-as-a-standalone-word-or-prefix-e-g-plams-and-replace-them-with-palmistry-this-includes-coursessection-tsx-comparisontable-tsx-servicessection-tsx-herosection-tsx-footer-tsx-header-tsx-and-any-other-component-where-these-strings-may-appear",
+      "title": "Search all frontend components and files for any occurrences of 'Star number', 'Plam' (as a standalone word or prefix, e.g. 'Plams'), and replace them with 'Palmistry'. This includes CoursesSection.tsx, ComparisonTable.tsx, ServicesSection.tsx, HeroSection.tsx, Footer.tsx, Header.tsx, and any other component where these strings may appear.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-brand-name-trioracle-by-astroplam-in-the-sticky-header-header-tsx-renders-correctly-and-fully-on-all-screen-sizes-without-overflow-or-truncation-apply-responsive-font-sizing-e-g-text-sm-on-mobile-scaling-up-on-larger-breakpoints-and-ensure-the-container-does-not-clip-or-hide-the-text-the-brand-name-must-remain-bold-as-previously-implemented",
+      "title": "Ensure the brand name 'TriOracle by Astroplam' in the sticky header (Header.tsx) renders correctly and fully on all screen sizes without overflow or truncation. Apply responsive font sizing (e.g. text-sm on mobile, scaling up on larger breakpoints) and ensure the container does not clip or hide the text. The brand name must remain bold as previously implemented.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-herosection-tsx-fix-the-hero-heading-trioracle-by-astroplam-and-subtitle-text-overflowing-beyond-the-right-edge-of-the-screen-on-mobile-apply-responsive-font-sizing-so-the-heading-scales-down-on-small-screens-e-g-text-3xl-on-mobile-scaling-up-to-text-5xl-6xl-on-larger-breakpoints-add-overflow-hidden-and-w-full-constraints-to-the-hero-container-and-ensure-all-text-wraps-correctly-within-the-viewport-width-with-no-horizontal-scroll-or-clipping-on-any-screen-size",
+      "title": "In HeroSection.tsx, fix the hero heading ('TriOracle by Astroplam') and subtitle text overflowing beyond the right edge of the screen on mobile. Apply responsive font sizing so the heading scales down on small screens (e.g. text-3xl on mobile, scaling up to text-5xl/6xl on larger breakpoints), add overflow-hidden and w-full constraints to the hero container, and ensure all text wraps correctly within the viewport width with no horizontal scroll or clipping on any screen size.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-audit-the-global-layout-in-app-tsx-and-index-css-index-html-to-ensure-no-element-anywhere-on-the-page-causes-horizontal-overflow-on-mobile-add-overflow-x-hidden-to-the-html-body-or-the-root-container-to-prevent-any-section-from-creating-a-horizontal-scrollbar",
+      "title": "Audit the global layout in App.tsx and index.css/index.html to ensure no element anywhere on the page causes horizontal overflow on mobile. Add overflow-x: hidden to the html/body or the root container to prevent any section from creating a horizontal scrollbar.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-phrase-no-manglik-yog-from-the-matchmaking-service-description-in-servicessection-tsx-the-service-name-and-description-should-no-longer-reference-no-manglik-yog-in-any-form",
+      "title": "Remove the phrase 'no Manglik Yog' from the Matchmaking service description in ServicesSection.tsx. The service name and description should no longer reference 'no Manglik Yog' in any form.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-three-place-of-birth-fields-state-country-and-city-to-the-booking-inquiry-forms-for-all-existing-services-one-question-matchmaking-muhurat-professional-advice-personal-phone-consultation-in-bookingform-tsx-these-fields-must-be-text-inputs-clearly-labelled-and-their-values-must-be-submitted-with-the-inquiry",
+      "title": "Add three Place of Birth fields — State, Country, and City — to the booking/inquiry forms for all existing services (One Question, Matchmaking, Muhurat, Professional Advice, Personal Phone Consultation) in BookingForm.tsx. These fields must be text inputs, clearly labelled, and their values must be submitted with the inquiry.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-new-6th-service-card-called-gemstone-consultation-at-a-fee-of-500-to-the-services-section-in-servicessection-tsx-the-card-must-display-the-service-name-a-short-description-about-gemstone-consultation-and-the-fee-500-a-book-inquire-button-opens-a-booking-form-collecting-full-name-email-date-of-birth-date-picker-time-of-birth-24-hour-hh-mm-state-country-city-place-of-birth-service-specific-question-past-life-event-notes-textarea-and-hand-picture-upload-image-file-on-submission-call-the-backend-submitinquiry-function-with-servicetype-set-to-gemstone-consultation-show-a-success-confirmation-message-after-submission",
+      "title": "Add a new 6th service card called 'Gemstone Consultation' at a fee of ₹500 to the Services section in ServicesSection.tsx. The card must display the service name, a short description about gemstone consultation, and the fee ₹500. A 'Book / Inquire' button opens a booking form collecting: full name, email, date of birth (date picker), time of birth (24-hour HH:MM), State, Country, City (place of birth), service-specific question, past life event notes (textarea), and hand picture upload (image file). On submission, call the backend submitInquiry function with serviceType set to 'Gemstone Consultation'. Show a success confirmation message after submission.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-inquiriestab-tsx-admin-dashboard-inquiries-view-to-display-the-new-place-of-birth-fields-state-country-city-for-each-inquiry-record-alongside-the-existing-fields",
+      "title": "Update InquiriesTab.tsx (admin dashboard inquiries view) to display the new place-of-birth fields (State, Country, City) for each inquiry record alongside the existing fields.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-new-special-unique-service-section-component-e-g-specialuniqueservicesection-tsx-and-insert-it-in-app-tsx-before-the-existing-servicessection-the-section-must-have-a-navigation-anchor-id-special-services-and-a-single-combined-introductory-description-explaining-that-trioracle-by-astroplam-predicts-your-nature-through-palmistry-and-numerology-then-advises-on-future-problems-across-financials-relationships-and-family-all-in-detail-add-a-special-services-navigation-link-in-header-tsx-that-smooth-scrolls-to-this-section",
+      "title": "Create a new 'Special Unique Service' section component (e.g. SpecialUniqueServiceSection.tsx) and insert it in App.tsx before the existing ServicesSection. The section must have a navigation anchor (id='special-services') and a single combined introductory description explaining that TriOracle by Astroplam predicts your nature through palmistry and numerology, then advises on future problems across financials, relationships, and family — all in detail. Add a 'Special Services' navigation link in Header.tsx that smooth-scrolls to this section.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-inside-the-specialuniqueservicesection-render-two-service-cards-1-video-prediction-2-500-with-a-short-description-about-receiving-a-personalised-video-reading-2-written-prediction-2-500-with-a-short-description-about-receiving-a-detailed-written-report-each-card-must-follow-the-same-visual-style-lavender-card-background-muted-gold-accent-sage-green-button-as-the-existing-service-cards-in-servicessection-each-card-has-a-book-inquire-button-that-opens-a-booking-form-modal",
+      "title": "Inside the SpecialUniqueServiceSection, render two service cards: (1) Video Prediction — ₹2,500, with a short description about receiving a personalised video reading; (2) Written Prediction — ₹2,500, with a short description about receiving a detailed written report. Each card must follow the same visual style (lavender card background, muted gold accent, sage green button) as the existing service cards in ServicesSection. Each card has a 'Book / Inquire' button that opens a booking form modal.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-booking-form-for-each-special-unique-service-card-video-prediction-and-written-prediction-the-form-must-collect-full-name-email-date-of-birth-date-picker-time-of-birth-24-hour-hh-mm-text-time-input-place-of-birth-state-text-country-text-city-text-a-multi-file-upload-field-labelled-palm-photos-accepting-up-to-5-image-files-simultaneously-a-special-question-field-what-you-want-to-know-more-about-yourself-and-a-past-life-events-textarea-on-submission-call-the-backend-submitinquiry-function-with-the-appropriate-servicetype-video-prediction-or-written-prediction-and-all-collected-field-values-display-a-success-confirmation-message-after-successful-submission",
+      "title": "Implement a booking form for each Special Unique Service card (Video Prediction and Written Prediction). The form must collect: full name, email, date of birth (date picker), time of birth (24-hour HH:MM text/time input), place of birth — State (text), Country (text), City (text), a multi-file upload field labelled 'Palm Photos' accepting up to 5 image files simultaneously, a 'Special Question' field (what you want to know more about yourself), and a 'Past Life Events' textarea. On submission, call the backend submitInquiry function with the appropriate serviceType ('Video Prediction' or 'Written Prediction') and all collected field values. Display a success confirmation message after successful submission.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-inquiriestab-tsx-in-the-admin-dashboard-to-display-special-unique-service-inquiries-video-prediction-and-written-prediction-for-these-inquiry-types-show-all-submitted-fields-including-the-special-question-past-life-events-notes-place-of-birth-state-country-city-and-thumbnail-previews-of-all-uploaded-palm-photos-up-to-5-with-an-option-to-view-each-full-size",
+      "title": "Update InquiriesTab.tsx in the admin dashboard to display Special Unique Service inquiries (Video Prediction and Written Prediction). For these inquiry types, show all submitted fields including the special question, past life events notes, place of birth (State, Country, City), and thumbnail previews of all uploaded palm photos (up to 5), with an option to view each full-size.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-footer-tsx-add-the-contact-email-address-vikaskharb00007-gmail-com-to-the-contact-footer-section-display-it-as-a-clickable-mailto-link-clearly-labelled-e-g-email-or-with-an-envelope-icon-within-the-existing-contact-information-area-of-the-footer",
+      "title": "In frontend/src/components/Footer.tsx, add the contact email address vikaskharb00007@gmail.com to the Contact/Footer section. Display it as a clickable mailto: link clearly labelled (e.g. 'Email:' or with an envelope icon) within the existing contact information area of the footer.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-seed-number-numeric-input-field-valid-range-1-249-inclusive-to-the-one-question-service-booking-form-in-bookingform-tsx-the-field-must-be-clearly-labelled-seed-number-accept-only-integer-values-between-1-and-249-and-its-value-must-be-submitted-alongside-all-other-inquiry-fields-when-the-form-is-sent",
+      "title": "Add a Seed Number numeric input field (valid range: 1–249, inclusive) to the One Question service booking form in BookingForm.tsx. The field must be clearly labelled 'Seed Number', accept only integer values between 1 and 249, and its value must be submitted alongside all other inquiry fields when the form is sent.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-inquiriestab-tsx-in-the-admin-dashboard-to-display-the-seed-number-field-for-one-question-service-inquiries-show-the-seed-number-alongside-the-other-inquiry-details-service-type-visitor-name-dob-question-etc-for-any-inquiry-where-a-seed-number-was-submitted",
+      "title": "Update InquiriesTab.tsx in the Admin Dashboard to display the Seed Number field for One Question service inquiries. Show the seed number alongside the other inquiry details (service type, visitor name, DOB, question, etc.) for any inquiry where a seed number was submitted.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Courses section with 4 courses, full syllabuses, and fees",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Services section with 5 services, pricing, and booking/inquiry forms (DOB, question, past life notes, hand picture upload)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Blog section with admin login (Internet Identity) to create and manage posts, publicly viewable",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Admin dashboard to view all form submissions including DOB, questions, notes, and uploaded hand pictures",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Comparison table (Astrology/Numerology/Palmistry) at the bottom of the page covering Marriage, Property, Travel, Health, etc.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Light, modern, spiritual color palette design with elegant styling",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Create the backend data model and actor with the following stable storage: (1) Blog posts — id, title, content, author, createdAt, published bool; (2) Inquiries/Bookings — id, serviceType, visitorName, dob, question, pastLifeNotes, handPictureBlob (as Blob or base64 text), submittedAt; (3) Admin principal whitelist. Expose update functions: createPost, updatePost, deletePost, publishPost; submitInquiry (stores inquiry with hand picture bytes); addAdmin/removeAdmin. Expose query functions: getAllPosts (public, returns published only), getAllPostsAdmin (all posts, admin only), getAllInquiries (admin only), isAdmin (caller check).",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Change 'Introduction to Vedic cards' to 'Introduction to Nadi Cards' in Nadi Cards course syllabus",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Matchmaking service form split into two identical sections (Person 1 & Person 2), each with name, email, DOB, and time of birth (24-hour HH:MM)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Add time of birth field (24-hour HH:MM format) alongside DOB in all services booking forms",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Update brand name to 'TriOracle by Astroplam' everywhere on the site (header, footer, page title, etc.)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Update the backend Inquiry data type and the submitInquiry function to accept and store the time of birth field alongside the date of birth. For the Matchmaking service, also accept and store Person 2's name, email, date of birth, and time of birth as additional fields on the inquiry record.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Make 'TriOracle by Astroplam' brand name bold everywhere it appears (header, footer, and any other instances)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Replace any occurrences of 'Star number', 'Plam', or 'Plams' with 'Palmistry' across the site",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Ensure 'TriOracle by Astroplam' brand name fits properly on all screen sizes — fix overflow/truncation with responsive font sizing",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Fix hero section heading and subtitle overflow on mobile — make text fully responsive so everything fits within a single viewport frame without horizontal overflow",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Remove 'no Manglik Yog' from the Matchmaking service description",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Add new Gemstone Consultation service at ₹500 with full booking/inquiry form (name, email, DOB, time of birth, State, Country, City, question, past life notes, hand picture upload)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Add Place of Birth fields (State, Country, City) to booking/inquiry forms for all services",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Update backend Inquiry data model and submitInquiry function to store place of birth fields (State, Country, City)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-26",
+      "summary": "Update the backend Inquiry data type in backend/main.mo to add three optional place-of-birth fields: birthState (Text), birthCountry (Text), and birthCity (Text). Update the submitInquiry function to accept and persist these three new fields alongside the existing inquiry fields.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-27",
+      "summary": "Add 'Special Unique Service' section before existing Services section with single combined intro, two service cards (Video Prediction ₹2,500 and Written Prediction ₹2,500), each with booking form: name, email, DOB, time of birth (24hr HH:MM), place of birth (State/Country/City), multi-file upload up to 5 palm photos, special question, past life events textarea",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-31",
+      "summary": "Update the backend Inquiry data type in backend/main.mo to support the multi-palm-photo upload for the Special Unique Service. Add an optional field (or extend the existing handPicture storage) to store up to 5 palm photo blobs per inquiry. Update the submitInquiry function signature to accept an array of up to 5 image blobs (e.g. palmPhotos: [Blob]) and persist them on the Inquiry record. Ensure backward compatibility with existing single-photo inquiries (existing handPictureBlob field remains).",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-32",
+      "summary": "Add contact email vikaskharb00007@gmail.com to the Contact section in the footer/contact area",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-33",
+      "summary": "Add a Seed Number field (numeric input, range 1–249) to the One Question service booking form; store and display it in the Admin Dashboard alongside other inquiry details",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-35",
+      "summary": "Update the backend Inquiry data type in backend/main.mo to add an optional seedNumber field (e.g. seedNumber: ?Nat) to the Inquiry record. Update the submitInquiry function to accept and persist this field. Ensure full backward compatibility so that existing inquiries without a seed number are unaffected.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "TriOracle / AstroPlan",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
