@@ -1,0 +1,147 @@
+import React, { useState } from 'react';
+import { Loader2, Plus, Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { useGetAllPostsAdmin, useDeletePost, usePublishPost } from '../hooks/useQueries';
+import BlogPostEditor from './BlogPostEditor';
+import type { Post } from '../backend';
+import { toast } from 'sonner';
+
+export default function BlogManagementTab() {
+  const { data: posts, isLoading } = useGetAllPostsAdmin();
+  const deleteMutation = useDeletePost();
+  const publishMutation = usePublishPost();
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [showEditor, setShowEditor] = useState(false);
+
+  const formatDate = (time: bigint) => {
+    const ms = Number(time / BigInt(1_000_000));
+    return new Date(ms).toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const handleDelete = async (post: Post) => {
+    if (!confirm(`Delete "${post.title}"?`)) return;
+    try {
+      await deleteMutation.mutateAsync(post.id);
+      toast.success('Post deleted');
+    } catch {
+      toast.error('Failed to delete post');
+    }
+  };
+
+  const handleTogglePublish = async (post: Post) => {
+    try {
+      await publishMutation.mutateAsync({ id: post.id, published: !post.published });
+      toast.success(post.published ? 'Post unpublished' : 'Post published');
+    } catch {
+      toast.error('Failed to update post');
+    }
+  };
+
+  const handleEdit = (post: Post) => {
+    setEditingPost(post);
+    setShowEditor(true);
+  };
+
+  const handleCloseEditor = () => {
+    setShowEditor(false);
+    setEditingPost(null);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Loader2 size={32} className="animate-spin text-gold/60" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-charcoal/50">{posts?.length || 0} total posts</p>
+        <button
+          onClick={() => { setEditingPost(null); setShowEditor(true); }}
+          className="btn-gold flex items-center gap-2 text-sm"
+        >
+          <Plus size={14} />
+          New Post
+        </button>
+      </div>
+
+      {showEditor && (
+        <BlogPostEditor post={editingPost} onClose={handleCloseEditor} />
+      )}
+
+      {!posts || posts.length === 0 ? (
+        <div className="text-center py-16">
+          <p className="font-serif text-xl text-charcoal/40">No posts yet</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {posts.map((post) => (
+            <div
+              key={post.id.toString()}
+              className="rounded-xl border border-gold/20 bg-white/60 p-4 flex items-start gap-4"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-serif font-semibold text-charcoal truncate">{post.title}</h3>
+                  <Badge
+                    variant={post.published ? 'default' : 'secondary'}
+                    className={`text-xs shrink-0 ${post.published ? 'bg-sage/20 text-sage-dark border-sage/30' : 'bg-charcoal/10 text-charcoal/50'}`}
+                  >
+                    {post.published ? 'Published' : 'Draft'}
+                  </Badge>
+                </div>
+                <p className="text-xs text-charcoal/50">
+                  By {post.author} · {formatDate(post.createdAt)}
+                </p>
+                <p className="text-sm text-charcoal/60 mt-1 line-clamp-2">{post.content}</p>
+              </div>
+
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  onClick={() => handleEdit(post)}
+                  className="p-2 text-charcoal/50 hover:text-gold-dark hover:bg-gold/10 rounded-lg transition-colors"
+                  title="Edit"
+                >
+                  <Edit2 size={14} />
+                </button>
+                <button
+                  onClick={() => handleTogglePublish(post)}
+                  disabled={publishMutation.isPending}
+                  className="p-2 text-charcoal/50 hover:text-sage-dark hover:bg-sage/10 rounded-lg transition-colors"
+                  title={post.published ? 'Unpublish' : 'Publish'}
+                >
+                  {publishMutation.isPending ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : post.published ? (
+                    <EyeOff size={14} />
+                  ) : (
+                    <Eye size={14} />
+                  )}
+                </button>
+                <button
+                  onClick={() => handleDelete(post)}
+                  disabled={deleteMutation.isPending}
+                  className="p-2 text-charcoal/50 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+                  title="Delete"
+                >
+                  {deleteMutation.isPending ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Trash2 size={14} />
+                  )}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
