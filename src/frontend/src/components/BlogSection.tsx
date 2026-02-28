@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Star, Plus, Loader2, BookOpen } from 'lucide-react';
-import { useGetAllPosts, useCheckAdmin } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import BlogPostCard from './BlogPostCard';
-import BlogPostEditor from './BlogPostEditor';
-import type { Post } from '../backend';
+import { BookOpen, Loader2, Plus, Star } from "lucide-react";
+import React, { useState } from "react";
+import type { Post } from "../backend";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import { useCheckAdmin, useGetAllPosts } from "../hooks/useQueries";
+import BlogPostCard from "./BlogPostCard";
+import BlogPostEditor from "./BlogPostEditor";
 
 export default function BlogSection() {
   const { data: posts, isLoading } = useGetAllPosts();
@@ -37,7 +37,8 @@ export default function BlogSection() {
           </div>
           <h2 className="section-heading">Blog & Notice Board</h2>
           <p className="section-subheading max-w-2xl mx-auto">
-            Insights, announcements, and wisdom from the world of astrology and numerology
+            Insights, announcements, and wisdom from the world of astrology and
+            numerology
           </p>
         </div>
 
@@ -45,7 +46,11 @@ export default function BlogSection() {
         {isAuthenticated && isAdmin && (
           <div className="flex justify-end mb-6">
             <button
-              onClick={() => { setEditingPost(null); setShowEditor(true); }}
+              type="button"
+              onClick={() => {
+                setEditingPost(null);
+                setShowEditor(true);
+              }}
               className="btn-gold flex items-center gap-2 text-sm"
             >
               <Plus size={16} />
@@ -56,10 +61,7 @@ export default function BlogSection() {
 
         {/* Blog Post Editor Modal */}
         {showEditor && (
-          <BlogPostEditor
-            post={editingPost}
-            onClose={handleCloseEditor}
-          />
+          <BlogPostEditor post={editingPost} onClose={handleCloseEditor} />
         )}
 
         {/* Posts */}
@@ -71,7 +73,9 @@ export default function BlogSection() {
           <div className="text-center py-16">
             <BookOpen size={48} className="text-gold/30 mx-auto mb-4" />
             <p className="font-serif text-xl text-charcoal/40">No posts yet</p>
-            <p className="text-sm text-charcoal/30 mt-1">Check back soon for updates and insights</p>
+            <p className="text-sm text-charcoal/30 mt-1">
+              Check back soon for updates and insights
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

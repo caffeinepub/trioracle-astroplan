@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
-import { Edit2, Trash2, Eye, EyeOff, Calendar, User, Loader2 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { useDeletePost, usePublishPost } from '../hooks/useQueries';
-import type { Post } from '../backend';
-import { toast } from 'sonner';
+import { Badge } from "@/components/ui/badge";
+import {
+  Calendar,
+  Edit2,
+  Eye,
+  EyeOff,
+  Loader2,
+  Trash2,
+  User,
+} from "lucide-react";
+import React, { useState } from "react";
+import { toast } from "sonner";
+import type { Post } from "../backend";
+import { useDeletePost, usePublishPost } from "../hooks/useQueries";
 
 interface BlogPostCardProps {
   post: Post;
@@ -11,55 +19,66 @@ interface BlogPostCardProps {
   onEdit: (post: Post) => void;
 }
 
-export default function BlogPostCard({ post, isAdmin, onEdit }: BlogPostCardProps) {
+export default function BlogPostCard({
+  post,
+  isAdmin,
+  onEdit,
+}: BlogPostCardProps) {
   const [expanded, setExpanded] = useState(false);
   const deleteMutation = useDeletePost();
   const publishMutation = usePublishPost();
 
   const formatDate = (time: bigint) => {
     const ms = Number(time / BigInt(1_000_000));
-    return new Date(ms).toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return new Date(ms).toLocaleDateString("en-IN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this post?')) return;
+    if (!confirm("Are you sure you want to delete this post?")) return;
     try {
       await deleteMutation.mutateAsync(post.id);
-      toast.success('Post deleted successfully');
+      toast.success("Post deleted successfully");
     } catch {
-      toast.error('Failed to delete post');
+      toast.error("Failed to delete post");
     }
   };
 
   const handleTogglePublish = async () => {
     try {
-      await publishMutation.mutateAsync({ id: post.id, published: !post.published });
-      toast.success(post.published ? 'Post unpublished' : 'Post published');
+      await publishMutation.mutateAsync({
+        id: post.id,
+        published: !post.published,
+      });
+      toast.success(post.published ? "Post unpublished" : "Post published");
     } catch {
-      toast.error('Failed to update post status');
+      toast.error("Failed to update post status");
     }
   };
 
   const truncated = post.content.length > 200 && !expanded;
-  const displayContent = truncated ? post.content.slice(0, 200) + '...' : post.content;
+  const displayContent = truncated
+    ? `${post.content.slice(0, 200)}...`
+    : post.content;
 
   return (
     <div className="card-hover rounded-xl border border-lavender-dark/30 bg-lavender/40 p-6 flex flex-col">
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex-1">
-          <h3 className="font-serif text-lg font-semibold text-charcoal leading-tight">{post.title}</h3>
+          <h3 className="font-serif text-lg font-semibold text-charcoal leading-tight">
+            {post.title}
+          </h3>
         </div>
         {isAdmin && (
           <Badge
-            variant={post.published ? 'default' : 'secondary'}
-            className={`text-xs shrink-0 ${post.published ? 'bg-sage/20 text-sage-dark border-sage/30' : 'bg-charcoal/10 text-charcoal/50'}`}
+            variant={post.published ? "default" : "secondary"}
+            className={`text-xs shrink-0 ${post.published ? "bg-sage/20 text-sage-dark border-sage/30" : "bg-charcoal/10 text-charcoal/50"}`}
           >
-            {post.published ? 'Published' : 'Draft'}
+            {post.published ? "Published" : "Draft"}
           </Badge>
         )}
       </div>
@@ -82,10 +101,11 @@ export default function BlogPostCard({ post, isAdmin, onEdit }: BlogPostCardProp
       </p>
       {post.content.length > 200 && (
         <button
+          type="button"
           onClick={() => setExpanded(!expanded)}
           className="text-xs text-gold-dark hover:text-gold mt-2 font-medium transition-colors"
         >
-          {expanded ? 'Show less' : 'Read more'}
+          {expanded ? "Show less" : "Read more"}
         </button>
       )}
 
@@ -93,6 +113,7 @@ export default function BlogPostCard({ post, isAdmin, onEdit }: BlogPostCardProp
       {isAdmin && (
         <div className="flex items-center gap-2 mt-4 pt-4 border-t border-lavender-dark/20">
           <button
+            type="button"
             onClick={() => onEdit(post)}
             className="flex items-center gap-1 text-xs text-charcoal/60 hover:text-gold-dark transition-colors px-2 py-1 rounded hover:bg-gold/10"
           >
@@ -100,6 +121,7 @@ export default function BlogPostCard({ post, isAdmin, onEdit }: BlogPostCardProp
             Edit
           </button>
           <button
+            type="button"
             onClick={handleTogglePublish}
             disabled={publishMutation.isPending}
             className="flex items-center gap-1 text-xs text-charcoal/60 hover:text-sage-dark transition-colors px-2 py-1 rounded hover:bg-sage/10"
@@ -111,9 +133,10 @@ export default function BlogPostCard({ post, isAdmin, onEdit }: BlogPostCardProp
             ) : (
               <Eye size={12} />
             )}
-            {post.published ? 'Unpublish' : 'Publish'}
+            {post.published ? "Unpublish" : "Publish"}
           </button>
           <button
+            type="button"
             onClick={handleDelete}
             disabled={deleteMutation.isPending}
             className="flex items-center gap-1 text-xs text-charcoal/60 hover:text-destructive transition-colors px-2 py-1 rounded hover:bg-destructive/10 ml-auto"

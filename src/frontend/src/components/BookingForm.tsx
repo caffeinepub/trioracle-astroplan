@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
-import { Loader2, CheckCircle, Upload, X, Users, User, MapPin, Hash } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { useSubmitInquiry } from '../hooks/useQueries';
-import { toast } from 'sonner';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  CheckCircle,
+  Hash,
+  Loader2,
+  MapPin,
+  Upload,
+  User,
+  Users,
+  X,
+} from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useSubmitInquiry } from "../hooks/useQueries";
 
 interface BookingFormProps {
   serviceId: number;
@@ -42,11 +52,16 @@ function PlaceOfBirthSection({
     <div className="border border-gold/15 rounded-lg p-3 bg-white/40 space-y-2">
       <div className="flex items-center gap-2 mb-1">
         <MapPin size={13} className="text-gold-dark" />
-        <span className="text-xs font-semibold text-charcoal/70 uppercase tracking-wide">Place of Birth</span>
+        <span className="text-xs font-semibold text-charcoal/70 uppercase tracking-wide">
+          Place of Birth
+        </span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
-          <Label htmlFor={`${prefix}-city`} className="text-xs text-charcoal/70 mb-1">
+          <Label
+            htmlFor={`${prefix}-city`}
+            className="text-xs text-charcoal/70 mb-1"
+          >
             City
           </Label>
           <Input
@@ -58,7 +73,10 @@ function PlaceOfBirthSection({
           />
         </div>
         <div>
-          <Label htmlFor={`${prefix}-state`} className="text-xs text-charcoal/70 mb-1">
+          <Label
+            htmlFor={`${prefix}-state`}
+            className="text-xs text-charcoal/70 mb-1"
+          >
             State
           </Label>
           <Input
@@ -70,7 +88,10 @@ function PlaceOfBirthSection({
           />
         </div>
         <div>
-          <Label htmlFor={`${prefix}-country`} className="text-xs text-charcoal/70 mb-1">
+          <Label
+            htmlFor={`${prefix}-country`}
+            className="text-xs text-charcoal/70 mb-1"
+          >
             Country
           </Label>
           <Input
@@ -103,13 +124,18 @@ function PersonSection({
     <div className="border border-gold/20 rounded-lg p-4 bg-white/50 space-y-3">
       <div className="flex items-center gap-2 mb-1">
         <User size={14} className="text-gold-dark" />
-        <span className="text-sm font-semibold text-charcoal font-serif">{label}</span>
+        <span className="text-sm font-semibold text-charcoal font-serif">
+          {label}
+        </span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <Label htmlFor={`${prefix}-name`} className="text-xs text-charcoal/70 mb-1">
-            Full Name {required && '*'}
+          <Label
+            htmlFor={`${prefix}-name`}
+            className="text-xs text-charcoal/70 mb-1"
+          >
+            Full Name {required && "*"}
           </Label>
           <Input
             id={`${prefix}-name`}
@@ -121,7 +147,10 @@ function PersonSection({
           />
         </div>
         <div>
-          <Label htmlFor={`${prefix}-email`} className="text-xs text-charcoal/70 mb-1">
+          <Label
+            htmlFor={`${prefix}-email`}
+            className="text-xs text-charcoal/70 mb-1"
+          >
             Email
           </Label>
           <Input
@@ -137,8 +166,11 @@ function PersonSection({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <Label htmlFor={`${prefix}-dob`} className="text-xs text-charcoal/70 mb-1">
-            Date of Birth {required && '*'}
+          <Label
+            htmlFor={`${prefix}-dob`}
+            className="text-xs text-charcoal/70 mb-1"
+          >
+            Date of Birth {required && "*"}
           </Label>
           <Input
             id={`${prefix}-dob`}
@@ -150,7 +182,10 @@ function PersonSection({
           />
         </div>
         <div>
-          <Label htmlFor={`${prefix}-tob`} className="text-xs text-charcoal/70 mb-1">
+          <Label
+            htmlFor={`${prefix}-tob`}
+            className="text-xs text-charcoal/70 mb-1"
+          >
             Time of Birth (24-hr)
           </Label>
           <Input
@@ -167,29 +202,47 @@ function PersonSection({
   );
 }
 
-export default function BookingForm({ serviceId, serviceName, onSuccess }: BookingFormProps) {
+export default function BookingForm({
+  serviceId,
+  serviceName,
+  onSuccess,
+}: BookingFormProps) {
   const isMatchmaking = serviceId === MATCHMAKING_SERVICE_ID;
   const isOneQuestion = serviceId === ONE_QUESTION_SERVICE_ID;
 
   // Person 1 (primary) fields
-  const [person1, setPerson1] = useState<PersonFields>({ name: '', email: '', dob: '', tob: '' });
+  const [person1, setPerson1] = useState<PersonFields>({
+    name: "",
+    email: "",
+    dob: "",
+    tob: "",
+  });
 
   // Person 2 fields (only used for matchmaking)
-  const [person2, setPerson2] = useState<PersonFields>({ name: '', email: '', dob: '', tob: '' });
+  const [person2, setPerson2] = useState<PersonFields>({
+    name: "",
+    email: "",
+    dob: "",
+    tob: "",
+  });
 
   // Place of birth fields (Person 1 / primary)
-  const [placeOfBirth, setPlaceOfBirth] = useState<PlaceOfBirthFields>({ state: '', country: '', city: '' });
+  const [placeOfBirth, setPlaceOfBirth] = useState<PlaceOfBirthFields>({
+    state: "",
+    country: "",
+    city: "",
+  });
 
   // Non-matchmaking single-person fields
-  const [question, setQuestion] = useState('');
-  const [pastLifeNotes, setPastLifeNotes] = useState('');
+  const [question, setQuestion] = useState("");
+  const [pastLifeNotes, setPastLifeNotes] = useState("");
   const [handPicture, setHandPicture] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [submitted, setSubmitted] = useState(false);
 
   // Seed number (only for One Question service)
-  const [seedNumber, setSeedNumber] = useState('');
-  const [seedNumberError, setSeedNumberError] = useState('');
+  const [seedNumber, setSeedNumber] = useState("");
+  const [seedNumberError, setSeedNumberError] = useState("");
 
   const submitMutation = useSubmitInquiry();
 
@@ -201,17 +254,17 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
   const handleSeedNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
     // Allow only digits
-    if (raw !== '' && !/^\d+$/.test(raw)) return;
+    if (raw !== "" && !/^\d+$/.test(raw)) return;
     setSeedNumber(raw);
-    if (raw === '') {
-      setSeedNumberError('');
+    if (raw === "") {
+      setSeedNumberError("");
       return;
     }
-    const num = parseInt(raw, 10);
+    const num = Number.parseInt(raw, 10);
     if (num < 1 || num > 249) {
-      setSeedNumberError('Seed number must be between 1 and 249.');
+      setSeedNumberError("Seed number must be between 1 and 249.");
     } else {
-      setSeedNumberError('');
+      setSeedNumberError("");
     }
   };
 
@@ -219,7 +272,7 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
     e.preventDefault();
 
     if (!person1.name.trim() || !person1.dob) {
-      toast.error('Please fill in your name and date of birth.');
+      toast.error("Please fill in your name and date of birth.");
       return;
     }
 
@@ -231,20 +284,34 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
     // Validate seed number for One Question service
     if (isOneQuestion) {
       if (!seedNumber.trim()) {
-        toast.error('Please enter a seed number between 1 and 249.');
+        toast.error("Please enter a seed number between 1 and 249.");
         return;
       }
-      const num = parseInt(seedNumber, 10);
-      if (isNaN(num) || num < 1 || num > 249) {
-        toast.error('Seed number must be between 1 and 249.');
+      const num = Number.parseInt(seedNumber, 10);
+      if (Number.isNaN(num) || num < 1 || num > 249) {
+        toast.error("Seed number must be between 1 and 249.");
         return;
       }
     }
 
     const parsedSeedNumber =
       isOneQuestion && seedNumber.trim()
-        ? BigInt(parseInt(seedNumber, 10))
+        ? BigInt(Number.parseInt(seedNumber, 10))
         : null;
+
+    // Encode email into question field for admin visibility
+    const emailPrefix = person1.email.trim()
+      ? `[EMAIL:${person1.email.trim()}]\n`
+      : "";
+    let finalQuestion: string;
+    if (isMatchmaking) {
+      const p2email = person2.email.trim()
+        ? ` | P2 Email: ${person2.email.trim()}`
+        : "";
+      finalQuestion = emailPrefix + question.trim() + p2email;
+    } else {
+      finalQuestion = emailPrefix + question.trim();
+    }
 
     try {
       await submitMutation.mutateAsync({
@@ -252,11 +319,13 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
         visitorName: person1.name.trim(),
         dob: person1.dob,
         tob: person1.tob,
-        question: question.trim(),
+        question: finalQuestion,
         pastLifeNotes: pastLifeNotes.trim(),
         handPictureFile: handPicture,
         onProgress: setUploadProgress,
-        relationshipPerson2Name: isMatchmaking ? person2.name.trim() || null : null,
+        relationshipPerson2Name: isMatchmaking
+          ? person2.name.trim() || null
+          : null,
         relationshipPerson2Dob: isMatchmaking ? person2.dob || null : null,
         relationshipPerson2Tob: isMatchmaking ? person2.tob || null : null,
         birthState: placeOfBirth.state.trim() || null,
@@ -265,12 +334,12 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
         seedNumber: parsedSeedNumber,
       });
       setSubmitted(true);
-      toast.success('Your inquiry has been submitted successfully!');
+      toast.success("Your inquiry has been submitted successfully!");
       setTimeout(() => {
         onSuccess();
       }, 2000);
-    } catch (err) {
-      toast.error('Failed to submit inquiry. Please try again.');
+    } catch (_err) {
+      toast.error("Failed to submit inquiry. Please try again.");
     }
   };
 
@@ -278,15 +347,24 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
     return (
       <div className="flex flex-col items-center justify-center py-6 text-center">
         <CheckCircle size={40} className="text-sage mb-3" />
-        <p className="font-serif text-lg font-semibold text-charcoal">Inquiry Submitted!</p>
-        <p className="text-sm text-charcoal/60 mt-1">We'll get back to you soon.</p>
+        <p className="font-serif text-lg font-semibold text-charcoal">
+          Thank You!
+        </p>
+        <p className="text-sm text-charcoal/60 mt-1">
+          Thank you for reaching out! We will connect with you soon.
+        </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white/70 rounded-lg p-4 border border-gold/15">
-      <p className="text-xs font-medium text-charcoal/50 uppercase tracking-wide">Booking: {serviceName}</p>
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 bg-white/70 rounded-lg p-4 border border-gold/15"
+    >
+      <p className="text-xs font-medium text-charcoal/50 uppercase tracking-wide">
+        Booking: {serviceName}
+      </p>
 
       {isMatchmaking ? (
         /* ── Matchmaking: Two-person layout ── */
@@ -320,7 +398,10 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
           />
 
           <div>
-            <Label htmlFor={`question-${serviceId}`} className="text-xs text-charcoal/70 mb-1">
+            <Label
+              htmlFor={`question-${serviceId}`}
+              className="text-xs text-charcoal/70 mb-1"
+            >
               Additional Details / Question
             </Label>
             <Textarea
@@ -338,28 +419,39 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
         <div className="space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <Label htmlFor={`name-${serviceId}`} className="text-xs text-charcoal/70 mb-1">
+              <Label
+                htmlFor={`name-${serviceId}`}
+                className="text-xs text-charcoal/70 mb-1"
+              >
                 Your Name *
               </Label>
               <Input
                 id={`name-${serviceId}`}
                 value={person1.name}
-                onChange={(e) => setPerson1({ ...person1, name: e.target.value })}
+                onChange={(e) =>
+                  setPerson1({ ...person1, name: e.target.value })
+                }
                 placeholder="Full name"
                 required
                 className="text-sm h-9 border-gold/20 focus:border-gold/50"
               />
             </div>
             <div>
-              <Label htmlFor={`email-${serviceId}`} className="text-xs text-charcoal/70 mb-1">
-                Email
+              <Label
+                htmlFor={`email-${serviceId}`}
+                className="text-xs text-charcoal/70 mb-1"
+              >
+                Email *
               </Label>
               <Input
                 id={`email-${serviceId}`}
                 type="email"
                 value={person1.email}
-                onChange={(e) => setPerson1({ ...person1, email: e.target.value })}
+                onChange={(e) =>
+                  setPerson1({ ...person1, email: e.target.value })
+                }
                 placeholder="your@email.com"
+                required
                 className="text-sm h-9 border-gold/20 focus:border-gold/50"
               />
             </div>
@@ -367,27 +459,37 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <Label htmlFor={`dob-${serviceId}`} className="text-xs text-charcoal/70 mb-1">
+              <Label
+                htmlFor={`dob-${serviceId}`}
+                className="text-xs text-charcoal/70 mb-1"
+              >
                 Date of Birth *
               </Label>
               <Input
                 id={`dob-${serviceId}`}
                 type="date"
                 value={person1.dob}
-                onChange={(e) => setPerson1({ ...person1, dob: e.target.value })}
+                onChange={(e) =>
+                  setPerson1({ ...person1, dob: e.target.value })
+                }
                 required
                 className="text-sm h-9 border-gold/20 focus:border-gold/50"
               />
             </div>
             <div>
-              <Label htmlFor={`tob-${serviceId}`} className="text-xs text-charcoal/70 mb-1">
+              <Label
+                htmlFor={`tob-${serviceId}`}
+                className="text-xs text-charcoal/70 mb-1"
+              >
                 Time of Birth (24-hr)
               </Label>
               <Input
                 id={`tob-${serviceId}`}
                 type="time"
                 value={person1.tob}
-                onChange={(e) => setPerson1({ ...person1, tob: e.target.value })}
+                onChange={(e) =>
+                  setPerson1({ ...person1, tob: e.target.value })
+                }
                 placeholder="HH:MM"
                 className="text-sm h-9 border-gold/20 focus:border-gold/50"
               />
@@ -406,10 +508,15 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
             <div className="border border-gold/15 rounded-lg p-3 bg-white/40 space-y-2">
               <div className="flex items-center gap-2 mb-1">
                 <Hash size={13} className="text-gold-dark" />
-                <span className="text-xs font-semibold text-charcoal/70 uppercase tracking-wide">Seed Number</span>
+                <span className="text-xs font-semibold text-charcoal/70 uppercase tracking-wide">
+                  Seed Number
+                </span>
               </div>
               <div>
-                <Label htmlFor={`seed-${serviceId}`} className="text-xs text-charcoal/70 mb-1">
+                <Label
+                  htmlFor={`seed-${serviceId}`}
+                  className="text-xs text-charcoal/70 mb-1"
+                >
                   Enter a number between 1 and 249 *
                 </Label>
                 <Input
@@ -420,10 +527,12 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
                   value={seedNumber}
                   onChange={handleSeedNumberChange}
                   placeholder="e.g. 137"
-                  className={`text-sm h-9 border-gold/20 focus:border-gold/50 w-full sm:w-40 ${seedNumberError ? 'border-destructive focus:border-destructive' : ''}`}
+                  className={`text-sm h-9 border-gold/20 focus:border-gold/50 w-full sm:w-40 ${seedNumberError ? "border-destructive focus:border-destructive" : ""}`}
                 />
                 {seedNumberError && (
-                  <p className="text-xs text-destructive mt-1">{seedNumberError}</p>
+                  <p className="text-xs text-destructive mt-1">
+                    {seedNumberError}
+                  </p>
                 )}
                 {!seedNumberError && seedNumber && (
                   <p className="text-xs text-sage mt-1">✓ Valid seed number</p>
@@ -433,7 +542,10 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
           )}
 
           <div>
-            <Label htmlFor={`question-${serviceId}`} className="text-xs text-charcoal/70 mb-1">
+            <Label
+              htmlFor={`question-${serviceId}`}
+              className="text-xs text-charcoal/70 mb-1"
+            >
               Your Question / Details
             </Label>
             <Textarea
@@ -447,7 +559,10 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
           </div>
 
           <div>
-            <Label htmlFor={`notes-${serviceId}`} className="text-xs text-charcoal/70 mb-1">
+            <Label
+              htmlFor={`notes-${serviceId}`}
+              className="text-xs text-charcoal/70 mb-1"
+            >
               Past Life Event Notes
             </Label>
             <Textarea
@@ -461,7 +576,9 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
           </div>
 
           <div>
-            <Label className="text-xs text-charcoal/70 mb-1">Hand Picture (Optional)</Label>
+            <Label className="text-xs text-charcoal/70 mb-1">
+              Hand Picture (Optional)
+            </Label>
             <div className="relative">
               <label
                 htmlFor={`hand-pic-${serviceId}`}
@@ -469,12 +586,17 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
               >
                 <Upload size={16} className="text-gold/60" />
                 <span className="text-sm text-charcoal/50">
-                  {handPicture ? handPicture.name : 'Upload hand picture (JPG, PNG)'}
+                  {handPicture
+                    ? handPicture.name
+                    : "Upload hand picture (JPG, PNG)"}
                 </span>
                 {handPicture && (
                   <button
                     type="button"
-                    onClick={(e) => { e.preventDefault(); setHandPicture(null); }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setHandPicture(null);
+                    }}
                     className="ml-auto text-charcoal/40 hover:text-destructive"
                   >
                     <X size={14} />
@@ -497,7 +619,9 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
-                <p className="text-xs text-charcoal/50 mt-0.5">Uploading: {uploadProgress}%</p>
+                <p className="text-xs text-charcoal/50 mt-0.5">
+                  Uploading: {uploadProgress}%
+                </p>
               </div>
             )}
           </div>
@@ -515,7 +639,7 @@ export default function BookingForm({ serviceId, serviceName, onSuccess }: Booki
             Submitting...
           </>
         ) : (
-          'Submit Inquiry'
+          "Submit Inquiry"
         )}
       </button>
     </form>

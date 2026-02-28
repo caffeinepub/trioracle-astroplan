@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
-import { Loader2, Plus, Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { useGetAllPostsAdmin, useDeletePost, usePublishPost } from '../hooks/useQueries';
-import BlogPostEditor from './BlogPostEditor';
-import type { Post } from '../backend';
-import { toast } from 'sonner';
+import { Badge } from "@/components/ui/badge";
+import { Edit2, Eye, EyeOff, Loader2, Plus, Trash2 } from "lucide-react";
+import React, { useState } from "react";
+import { toast } from "sonner";
+import type { Post } from "../backend";
+import {
+  useDeletePost,
+  useGetAllPostsAdmin,
+  usePublishPost,
+} from "../hooks/useQueries";
+import BlogPostEditor from "./BlogPostEditor";
 
 export default function BlogManagementTab() {
   const { data: posts, isLoading } = useGetAllPostsAdmin();
@@ -15,10 +19,10 @@ export default function BlogManagementTab() {
 
   const formatDate = (time: bigint) => {
     const ms = Number(time / BigInt(1_000_000));
-    return new Date(ms).toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return new Date(ms).toLocaleDateString("en-IN", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -26,18 +30,21 @@ export default function BlogManagementTab() {
     if (!confirm(`Delete "${post.title}"?`)) return;
     try {
       await deleteMutation.mutateAsync(post.id);
-      toast.success('Post deleted');
+      toast.success("Post deleted");
     } catch {
-      toast.error('Failed to delete post');
+      toast.error("Failed to delete post");
     }
   };
 
   const handleTogglePublish = async (post: Post) => {
     try {
-      await publishMutation.mutateAsync({ id: post.id, published: !post.published });
-      toast.success(post.published ? 'Post unpublished' : 'Post published');
+      await publishMutation.mutateAsync({
+        id: post.id,
+        published: !post.published,
+      });
+      toast.success(post.published ? "Post unpublished" : "Post published");
     } catch {
-      toast.error('Failed to update post');
+      toast.error("Failed to update post");
     }
   };
 
@@ -62,9 +69,15 @@ export default function BlogManagementTab() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-charcoal/50">{posts?.length || 0} total posts</p>
+        <p className="text-sm text-charcoal/50">
+          {posts?.length || 0} total posts
+        </p>
         <button
-          onClick={() => { setEditingPost(null); setShowEditor(true); }}
+          type="button"
+          onClick={() => {
+            setEditingPost(null);
+            setShowEditor(true);
+          }}
           className="btn-gold flex items-center gap-2 text-sm"
         >
           <Plus size={14} />
@@ -89,22 +102,27 @@ export default function BlogManagementTab() {
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-serif font-semibold text-charcoal truncate">{post.title}</h3>
+                  <h3 className="font-serif font-semibold text-charcoal truncate">
+                    {post.title}
+                  </h3>
                   <Badge
-                    variant={post.published ? 'default' : 'secondary'}
-                    className={`text-xs shrink-0 ${post.published ? 'bg-sage/20 text-sage-dark border-sage/30' : 'bg-charcoal/10 text-charcoal/50'}`}
+                    variant={post.published ? "default" : "secondary"}
+                    className={`text-xs shrink-0 ${post.published ? "bg-sage/20 text-sage-dark border-sage/30" : "bg-charcoal/10 text-charcoal/50"}`}
                   >
-                    {post.published ? 'Published' : 'Draft'}
+                    {post.published ? "Published" : "Draft"}
                   </Badge>
                 </div>
                 <p className="text-xs text-charcoal/50">
                   By {post.author} · {formatDate(post.createdAt)}
                 </p>
-                <p className="text-sm text-charcoal/60 mt-1 line-clamp-2">{post.content}</p>
+                <p className="text-sm text-charcoal/60 mt-1 line-clamp-2">
+                  {post.content}
+                </p>
               </div>
 
               <div className="flex items-center gap-1 shrink-0">
                 <button
+                  type="button"
                   onClick={() => handleEdit(post)}
                   className="p-2 text-charcoal/50 hover:text-gold-dark hover:bg-gold/10 rounded-lg transition-colors"
                   title="Edit"
@@ -112,10 +130,11 @@ export default function BlogManagementTab() {
                   <Edit2 size={14} />
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleTogglePublish(post)}
                   disabled={publishMutation.isPending}
                   className="p-2 text-charcoal/50 hover:text-sage-dark hover:bg-sage/10 rounded-lg transition-colors"
-                  title={post.published ? 'Unpublish' : 'Publish'}
+                  title={post.published ? "Unpublish" : "Publish"}
                 >
                   {publishMutation.isPending ? (
                     <Loader2 size={14} className="animate-spin" />
@@ -126,6 +145,7 @@ export default function BlogManagementTab() {
                   )}
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleDelete(post)}
                   disabled={deleteMutation.isPending}
                   className="p-2 text-charcoal/50 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"

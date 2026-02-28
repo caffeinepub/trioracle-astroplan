@@ -1,18 +1,31 @@
-import React, { useState, useRef } from 'react';
-import { Loader2, CheckCircle, Upload, X, MapPin, Hand, MessageSquare, Clock, User, Mail, Calendar } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
-import { useSubmitInquiry } from '../hooks/useQueries';
-import { toast } from 'sonner';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Calendar,
+  CheckCircle,
+  Clock,
+  Hand,
+  Loader2,
+  Mail,
+  MapPin,
+  MessageSquare,
+  Upload,
+  User,
+  X,
+} from "lucide-react";
+import type React from "react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
+import { useSubmitInquiry } from "../hooks/useQueries";
 
 // Service IDs for the special unique services
 export const VIDEO_PREDICTION_SERVICE_ID = 7;
@@ -21,7 +34,7 @@ export const WRITTEN_PREDICTION_SERVICE_ID = 8;
 interface SpecialServiceBookingFormProps {
   open: boolean;
   onClose: () => void;
-  serviceType: 'Video Prediction' | 'Written Prediction';
+  serviceType: "Video Prediction" | "Written Prediction";
   serviceId: number;
 }
 
@@ -33,16 +46,16 @@ export default function SpecialServiceBookingForm({
   serviceType,
   serviceId,
 }: SpecialServiceBookingFormProps) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [dob, setDob] = useState('');
-  const [tob, setTob] = useState('');
-  const [birthState, setBirthState] = useState('');
-  const [birthCountry, setBirthCountry] = useState('');
-  const [birthCity, setBirthCity] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [dob, setDob] = useState("");
+  const [tob, setTob] = useState("");
+  const [birthState, setBirthState] = useState("");
+  const [birthCountry, setBirthCountry] = useState("");
+  const [birthCity, setBirthCity] = useState("");
   const [palmPhotos, setPalmPhotos] = useState<File[]>([]);
-  const [specialQuestion, setSpecialQuestion] = useState('');
-  const [pastLifeEvents, setPastLifeEvents] = useState('');
+  const [specialQuestion, setSpecialQuestion] = useState("");
+  const [pastLifeEvents, setPastLifeEvents] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -54,11 +67,13 @@ export default function SpecialServiceBookingForm({
     const remaining = MAX_PALM_PHOTOS - palmPhotos.length;
     const toAdd = files.slice(0, remaining);
     if (files.length > remaining) {
-      toast.warning(`You can upload up to ${MAX_PALM_PHOTOS} palm photos. Only the first ${remaining} were added.`);
+      toast.warning(
+        `You can upload up to ${MAX_PALM_PHOTOS} palm photos. Only the first ${remaining} were added.`,
+      );
     }
     setPalmPhotos((prev) => [...prev, ...toAdd]);
     // Reset input so same files can be re-selected if removed
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const removePhoto = (index: number) => {
@@ -69,13 +84,17 @@ export default function SpecialServiceBookingForm({
     e.preventDefault();
 
     if (!name.trim()) {
-      toast.error('Please enter your full name.');
+      toast.error("Please enter your full name.");
       return;
     }
     if (!dob) {
-      toast.error('Please enter your date of birth.');
+      toast.error("Please enter your date of birth.");
       return;
     }
+
+    // Encode email into question field for admin visibility
+    const emailPrefix = email.trim() ? `[EMAIL:${email.trim()}]\n` : "";
+    const finalQuestion = emailPrefix + specialQuestion.trim();
 
     try {
       await submitMutation.mutateAsync({
@@ -83,7 +102,7 @@ export default function SpecialServiceBookingForm({
         visitorName: name.trim(),
         dob,
         tob,
-        question: specialQuestion.trim(),
+        question: finalQuestion,
         pastLifeNotes: pastLifeEvents.trim(),
         handPictureFile: null,
         palmPhotoFiles: palmPhotos,
@@ -96,25 +115,25 @@ export default function SpecialServiceBookingForm({
         birthCity: birthCity.trim() || null,
       });
       setSubmitted(true);
-      toast.success('Your inquiry has been submitted successfully!');
+      toast.success("Your inquiry has been submitted successfully!");
     } catch {
-      toast.error('Failed to submit inquiry. Please try again.');
+      toast.error("Failed to submit inquiry. Please try again.");
     }
   };
 
   const handleClose = () => {
     if (!submitMutation.isPending) {
       // Reset form state
-      setName('');
-      setEmail('');
-      setDob('');
-      setTob('');
-      setBirthState('');
-      setBirthCountry('');
-      setBirthCity('');
+      setName("");
+      setEmail("");
+      setDob("");
+      setTob("");
+      setBirthState("");
+      setBirthCountry("");
+      setBirthCity("");
       setPalmPhotos([]);
-      setSpecialQuestion('');
-      setPastLifeEvents('');
+      setSpecialQuestion("");
+      setPastLifeEvents("");
       setSubmitted(false);
       setUploadProgress(0);
       onClose();
@@ -122,25 +141,34 @@ export default function SpecialServiceBookingForm({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        if (!o) handleClose();
+      }}
+    >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-cream-bg border-gold/20">
         <DialogHeader>
           <DialogTitle className="font-serif text-xl text-charcoal flex items-center gap-2">
-            {serviceType === 'Video Prediction' ? '🎥' : '📝'} Book {serviceType}
+            {serviceType === "Video Prediction" ? "🎥" : "📝"} Book{" "}
+            {serviceType}
           </DialogTitle>
           <DialogDescription className="text-charcoal/60 text-sm">
-            Fill in your details below. Fee: <span className="font-semibold text-gold-dark">₹2,500</span>
+            Fill in your details below. Fee:{" "}
+            <span className="font-semibold text-gold-dark">₹2,500</span>
           </DialogDescription>
         </DialogHeader>
 
         {submitted ? (
           <div className="flex flex-col items-center justify-center py-10 text-center">
             <CheckCircle size={48} className="text-sage mb-4" />
-            <p className="font-serif text-xl font-semibold text-charcoal mb-2">Inquiry Submitted!</p>
-            <p className="text-sm text-charcoal/60 mb-6">
-              We'll review your details and get back to you soon with your {serviceType.toLowerCase()}.
+            <p className="font-serif text-xl font-semibold text-charcoal mb-2">
+              Thank You!
             </p>
-            <Button onClick={handleClose} className="btn-sage">
+            <p className="text-sm text-charcoal/60 mb-6">
+              Thank you for reaching out! We will connect with you soon.
+            </p>
+            <Button type="button" onClick={handleClose} className="btn-sage">
               Close
             </Button>
           </div>
@@ -150,11 +178,16 @@ export default function SpecialServiceBookingForm({
             <div className="space-y-3">
               <div className="flex items-center gap-2 mb-1">
                 <User size={14} className="text-gold-dark" />
-                <span className="text-xs font-semibold text-charcoal/70 uppercase tracking-wide">Personal Information</span>
+                <span className="text-xs font-semibold text-charcoal/70 uppercase tracking-wide">
+                  Personal Information
+                </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="sus-name" className="text-xs text-charcoal/70 mb-1 flex items-center gap-1">
+                  <Label
+                    htmlFor="sus-name"
+                    className="text-xs text-charcoal/70 mb-1 flex items-center gap-1"
+                  >
                     <User size={11} /> Full Name *
                   </Label>
                   <Input
@@ -167,8 +200,11 @@ export default function SpecialServiceBookingForm({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="sus-email" className="text-xs text-charcoal/70 mb-1 flex items-center gap-1">
-                    <Mail size={11} /> Email
+                  <Label
+                    htmlFor="sus-email"
+                    className="text-xs text-charcoal/70 mb-1 flex items-center gap-1"
+                  >
+                    <Mail size={11} /> Email *
                   </Label>
                   <Input
                     id="sus-email"
@@ -176,6 +212,7 @@ export default function SpecialServiceBookingForm({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your@email.com"
+                    required
                     className="text-sm h-9 border-gold/20 focus:border-gold/50 bg-white/70"
                   />
                 </div>
@@ -183,7 +220,10 @@ export default function SpecialServiceBookingForm({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="sus-dob" className="text-xs text-charcoal/70 mb-1 flex items-center gap-1">
+                  <Label
+                    htmlFor="sus-dob"
+                    className="text-xs text-charcoal/70 mb-1 flex items-center gap-1"
+                  >
                     <Calendar size={11} /> Date of Birth *
                   </Label>
                   <Input
@@ -196,7 +236,10 @@ export default function SpecialServiceBookingForm({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="sus-tob" className="text-xs text-charcoal/70 mb-1 flex items-center gap-1">
+                  <Label
+                    htmlFor="sus-tob"
+                    className="text-xs text-charcoal/70 mb-1 flex items-center gap-1"
+                  >
                     <Clock size={11} /> Time of Birth (24-hr)
                   </Label>
                   <Input
@@ -215,11 +258,18 @@ export default function SpecialServiceBookingForm({
             <div className="border border-gold/15 rounded-lg p-3 bg-white/40 space-y-2">
               <div className="flex items-center gap-2 mb-1">
                 <MapPin size={13} className="text-gold-dark" />
-                <span className="text-xs font-semibold text-charcoal/70 uppercase tracking-wide">Place of Birth</span>
+                <span className="text-xs font-semibold text-charcoal/70 uppercase tracking-wide">
+                  Place of Birth
+                </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <Label htmlFor="sus-city" className="text-xs text-charcoal/70 mb-1">City</Label>
+                  <Label
+                    htmlFor="sus-city"
+                    className="text-xs text-charcoal/70 mb-1"
+                  >
+                    City
+                  </Label>
                   <Input
                     id="sus-city"
                     value={birthCity}
@@ -229,7 +279,12 @@ export default function SpecialServiceBookingForm({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="sus-state" className="text-xs text-charcoal/70 mb-1">State</Label>
+                  <Label
+                    htmlFor="sus-state"
+                    className="text-xs text-charcoal/70 mb-1"
+                  >
+                    State
+                  </Label>
                   <Input
                     id="sus-state"
                     value={birthState}
@@ -239,7 +294,12 @@ export default function SpecialServiceBookingForm({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="sus-country" className="text-xs text-charcoal/70 mb-1">Country</Label>
+                  <Label
+                    htmlFor="sus-country"
+                    className="text-xs text-charcoal/70 mb-1"
+                  >
+                    Country
+                  </Label>
                   <Input
                     id="sus-country"
                     value={birthCountry}
@@ -260,16 +320,21 @@ export default function SpecialServiceBookingForm({
                     Palm Photos (up to {MAX_PALM_PHOTOS})
                   </span>
                 </div>
-                <span className="text-xs text-charcoal/40">{palmPhotos.length}/{MAX_PALM_PHOTOS}</span>
+                <span className="text-xs text-charcoal/40">
+                  {palmPhotos.length}/{MAX_PALM_PHOTOS}
+                </span>
               </div>
 
               {palmPhotos.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {palmPhotos.map((file, idx) => (
-                    <div key={idx} className="relative group">
+                    <div
+                      key={`palm-${file.name}-${idx}`}
+                      className="relative group"
+                    >
                       <img
                         src={URL.createObjectURL(file)}
-                        alt={`Palm photo ${idx + 1}`}
+                        alt={`Hand ${idx + 1}`}
                         className="w-16 h-16 object-cover rounded-lg border border-gold/20"
                       />
                       <button
@@ -303,7 +368,10 @@ export default function SpecialServiceBookingForm({
                     className="flex items-center gap-2 cursor-pointer border border-dashed border-gold/30 rounded-lg p-3 text-sm text-charcoal/60 hover:border-gold/60 hover:text-charcoal/80 transition-colors bg-white/30"
                   >
                     <Upload size={14} className="text-gold-dark" />
-                    <span>Click to upload palm photos ({MAX_PALM_PHOTOS - palmPhotos.length} remaining)</span>
+                    <span>
+                      Click to upload palm photos (
+                      {MAX_PALM_PHOTOS - palmPhotos.length} remaining)
+                    </span>
                   </label>
                   <p className="text-xs text-charcoal/40 mt-1">
                     Upload clear photos of both palms for accurate reading
@@ -329,7 +397,10 @@ export default function SpecialServiceBookingForm({
 
             {/* Special Question */}
             <div>
-              <Label htmlFor="sus-question" className="text-xs text-charcoal/70 mb-1 flex items-center gap-1">
+              <Label
+                htmlFor="sus-question"
+                className="text-xs text-charcoal/70 mb-1 flex items-center gap-1"
+              >
                 <MessageSquare size={11} className="text-gold-dark" />
                 Special Question — What do you want to know more about yourself?
               </Label>
@@ -345,7 +416,10 @@ export default function SpecialServiceBookingForm({
 
             {/* Past Life Events */}
             <div>
-              <Label htmlFor="sus-past-life" className="text-xs text-charcoal/70 mb-1">
+              <Label
+                htmlFor="sus-past-life"
+                className="text-xs text-charcoal/70 mb-1"
+              >
                 Past Life Events / Important Life Events (Optional)
               </Label>
               <Textarea
@@ -380,7 +454,7 @@ export default function SpecialServiceBookingForm({
                     Submitting…
                   </>
                 ) : (
-                  'Submit Inquiry'
+                  "Submit Inquiry"
                 )}
               </button>
             </div>

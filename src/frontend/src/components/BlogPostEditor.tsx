@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
-import { X, Loader2, Save } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { useCreatePost, useUpdatePost } from '../hooks/useQueries';
-import type { Post } from '../backend';
-import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2, Save, X } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import { toast } from "sonner";
+import type { Post } from "../backend";
+import { useCreatePost, useUpdatePost } from "../hooks/useQueries";
 
 interface BlogPostEditorProps {
   post: Post | null;
@@ -14,9 +21,9 @@ interface BlogPostEditorProps {
 }
 
 export default function BlogPostEditor({ post, onClose }: BlogPostEditorProps) {
-  const [title, setTitle] = useState(post?.title || '');
-  const [content, setContent] = useState(post?.content || '');
-  const [author, setAuthor] = useState(post?.author || '');
+  const [title, setTitle] = useState(post?.title || "");
+  const [content, setContent] = useState(post?.content || "");
+  const [author, setAuthor] = useState(post?.author || "");
 
   const createMutation = useCreatePost();
   const updateMutation = useUpdatePost();
@@ -27,36 +34,52 @@ export default function BlogPostEditor({ post, onClose }: BlogPostEditorProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) {
-      toast.error('Title and content are required.');
+      toast.error("Title and content are required.");
       return;
     }
 
     try {
       if (isEditing) {
-        await updateMutation.mutateAsync({ id: post.id, title: title.trim(), content: content.trim() });
-        toast.success('Post updated successfully');
+        await updateMutation.mutateAsync({
+          id: post.id,
+          title: title.trim(),
+          content: content.trim(),
+        });
+        toast.success("Post updated successfully");
       } else {
-        await createMutation.mutateAsync({ title: title.trim(), content: content.trim(), author: author.trim() || 'Admin' });
-        toast.success('Post created successfully');
+        await createMutation.mutateAsync({
+          title: title.trim(),
+          content: content.trim(),
+          author: author.trim() || "Admin",
+        });
+        toast.success("Post created successfully");
       }
       onClose();
     } catch {
-      toast.error('Failed to save post. Please try again.');
+      toast.error("Failed to save post. Please try again.");
     }
   };
 
   return (
-    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog
+      open
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
       <DialogContent className="max-w-2xl bg-cream-bg border-gold/20">
         <DialogHeader>
           <DialogTitle className="font-serif text-2xl text-charcoal">
-            {isEditing ? 'Edit Post' : 'Create New Post'}
+            {isEditing ? "Edit Post" : "Create New Post"}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="post-title" className="text-sm text-charcoal/70 mb-1">
+            <Label
+              htmlFor="post-title"
+              className="text-sm text-charcoal/70 mb-1"
+            >
               Title *
             </Label>
             <Input
@@ -71,7 +94,10 @@ export default function BlogPostEditor({ post, onClose }: BlogPostEditorProps) {
 
           {!isEditing && (
             <div>
-              <Label htmlFor="post-author" className="text-sm text-charcoal/70 mb-1">
+              <Label
+                htmlFor="post-author"
+                className="text-sm text-charcoal/70 mb-1"
+              >
                 Author
               </Label>
               <Input
@@ -85,7 +111,10 @@ export default function BlogPostEditor({ post, onClose }: BlogPostEditorProps) {
           )}
 
           <div>
-            <Label htmlFor="post-content" className="text-sm text-charcoal/70 mb-1">
+            <Label
+              htmlFor="post-content"
+              className="text-sm text-charcoal/70 mb-1"
+            >
               Content *
             </Label>
             <Textarea
@@ -117,7 +146,11 @@ export default function BlogPostEditor({ post, onClose }: BlogPostEditorProps) {
               ) : (
                 <Save size={14} />
               )}
-              {isPending ? 'Saving...' : isEditing ? 'Update Post' : 'Create Post'}
+              {isPending
+                ? "Saving..."
+                : isEditing
+                  ? "Update Post"
+                  : "Create Post"}
             </button>
           </DialogFooter>
         </form>

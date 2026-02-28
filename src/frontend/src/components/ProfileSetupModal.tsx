@@ -1,48 +1,67 @@
-import React, { useState } from 'react';
-import { Loader2, User } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useSaveCallerUserProfile } from '../hooks/useQueries';
-import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2, User } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useSaveCallerUserProfile } from "../hooks/useQueries";
 
 export default function ProfileSetupModal() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const saveMutation = useSaveCallerUserProfile();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      toast.error('Please enter your name.');
+      toast.error("Please enter your name.");
       return;
     }
     try {
-      await saveMutation.mutateAsync({ name: name.trim(), email: email.trim() });
-      toast.success('Profile saved!');
+      await saveMutation.mutateAsync({
+        name: name.trim(),
+        email: email.trim(),
+      });
+      toast.success("Profile saved!");
     } catch {
-      toast.error('Failed to save profile. Please try again.');
+      toast.error("Failed to save profile. Please try again.");
     }
   };
 
   return (
     <Dialog open>
-      <DialogContent className="max-w-md bg-cream-bg border-gold/20" onInteractOutside={(e) => e.preventDefault()}>
+      <DialogContent
+        className="max-w-md bg-cream-bg border-gold/20"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/30 flex items-center justify-center">
               <User size={18} className="text-gold-dark" />
             </div>
-            <DialogTitle className="font-serif text-2xl text-charcoal">Welcome!</DialogTitle>
+            <DialogTitle className="font-serif text-2xl text-charcoal">
+              Welcome!
+            </DialogTitle>
           </div>
           <DialogDescription className="text-charcoal/60">
-            Please set up your profile to continue. This helps us personalize your experience.
+            Please set up your profile to continue. This helps us personalize
+            your experience.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div>
-            <Label htmlFor="profile-name" className="text-sm text-charcoal/70 mb-1">
+            <Label
+              htmlFor="profile-name"
+              className="text-sm text-charcoal/70 mb-1"
+            >
               Your Name *
             </Label>
             <Input
@@ -55,7 +74,10 @@ export default function ProfileSetupModal() {
             />
           </div>
           <div>
-            <Label htmlFor="profile-email" className="text-sm text-charcoal/70 mb-1">
+            <Label
+              htmlFor="profile-email"
+              className="text-sm text-charcoal/70 mb-1"
+            >
               Email (optional)
             </Label>
             <Input
@@ -75,7 +97,7 @@ export default function ProfileSetupModal() {
             {saveMutation.isPending ? (
               <Loader2 size={16} className="animate-spin" />
             ) : null}
-            {saveMutation.isPending ? 'Saving...' : 'Save Profile'}
+            {saveMutation.isPending ? "Saving..." : "Save Profile"}
           </button>
         </form>
       </DialogContent>

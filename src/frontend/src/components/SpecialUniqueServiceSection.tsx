@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { Star, Video, FileText, Sparkles, Hand } from 'lucide-react';
+import { FileText, Hand, Sparkles, Star, Video } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
 import SpecialServiceBookingForm, {
   VIDEO_PREDICTION_SERVICE_ID,
   WRITTEN_PREDICTION_SERVICE_ID,
-} from './SpecialServiceBookingForm';
+} from "./SpecialServiceBookingForm";
 
-type ServiceType = 'Video Prediction' | 'Written Prediction';
+type ServiceType = "Video Prediction" | "Written Prediction";
 
 interface SpecialService {
   id: number;
@@ -15,43 +16,61 @@ interface SpecialService {
   shortDesc: string;
   fee: number;
   accentColor: string;
-  badgeColor: string;
+  badgeBg: string;
+  badgeText: string;
+  badgeBorder: string;
 }
 
 const specialServices: SpecialService[] = [
   {
     id: VIDEO_PREDICTION_SERVICE_ID,
-    type: 'Video Prediction',
+    type: "Video Prediction",
     icon: <Video size={26} />,
-    title: 'Video Prediction',
+    title: "Video Prediction",
     shortDesc:
-      'Receive a personalised video reading where our expert analyses your palm lines and numerology to reveal your nature, life path, and future guidance — delivered directly to you.',
+      "Receive a personalised video reading covering your full nature prediction, 10-year career advice, and guidance on relationship difficulties — our expert analyses your palm lines and numerology to deliver deep, life-changing insights directly to you.",
     fee: 2500,
-    accentColor: 'border-violet-200 bg-violet-50/60',
-    badgeColor: 'bg-violet-100 text-violet-700',
+    accentColor: "border-violet-200 bg-violet-50/60",
+    badgeBg: "bg-amber-100",
+    badgeText: "text-amber-700",
+    badgeBorder: "border-amber-200",
   },
   {
     id: WRITTEN_PREDICTION_SERVICE_ID,
-    type: 'Written Prediction',
+    type: "Written Prediction",
     icon: <FileText size={26} />,
-    title: 'Written Prediction',
+    title: "Written Prediction",
     shortDesc:
-      'Get a comprehensive written report covering your personality traits, financial outlook, relationship patterns, family dynamics, and future guidance — all in rich, actionable detail.',
+      "Get a comprehensive written report with your full nature prediction, a detailed 10-year career roadmap, and in-depth guidance on relationship difficulties — covering financials, family, and every key dimension of your life in rich, actionable detail.",
     fee: 2500,
-    accentColor: 'border-amber-200 bg-amber-50/60',
-    badgeColor: 'bg-amber-100 text-amber-700',
+    accentColor: "border-amber-200 bg-amber-50/60",
+    badgeBg: "bg-amber-100",
+    badgeText: "text-amber-700",
+    badgeBorder: "border-amber-200",
   },
 ];
 
+const includedFeatures = [
+  "Full nature & personality prediction",
+  "10-year career advice & roadmap",
+  "Relationship difficulty guidance",
+  "Financial & family outlook",
+  "Palmistry + Numerology combined",
+];
+
 export default function SpecialUniqueServiceSection() {
-  const [activeModal, setActiveModal] = useState<{ type: ServiceType; id: number } | null>(null);
+  const [activeModal, setActiveModal] = useState<{
+    type: ServiceType;
+    id: number;
+  } | null>(null);
 
   return (
     <div
       id="special-services"
       className="py-20 px-4 relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, oklch(0.97 0.012 85) 0%, oklch(0.93 0.018 280) 100%)',
+        background:
+          "linear-gradient(180deg, oklch(0.97 0.012 85) 0%, oklch(0.93 0.018 280) 100%)",
       }}
     >
       {/* Decorative background */}
@@ -71,27 +90,40 @@ export default function SpecialUniqueServiceSection() {
             <Sparkles size={14} className="text-gold" fill="currentColor" />
             <div className="celestial-divider w-12" />
           </div>
-          <h2 className="section-heading">Special Unique Service</h2>
+          <h2 className="section-heading">Unique Way to Prediction</h2>
 
-          {/* Combined intro description */}
+          {/* Combined intro description — "Palmistry" and "Numerology" highlighted gold */}
           <div className="max-w-3xl mx-auto mt-6 space-y-3">
-            <p className="text-charcoal/75 leading-relaxed text-base">
-              Through the ancient sciences of <span className="font-semibold text-gold-dark">Palmistry</span> and{' '}
-              <span className="font-semibold text-gold-dark">Numerology</span>, we reveal the deepest truths of your
-              nature — your strengths, hidden patterns, and the unique blueprint of your soul.
+            <p className="text-charcoal/80 leading-relaxed text-base text-center">
+              Through the ancient sciences of{" "}
+              <span className="font-bold text-gold-dark">Palmistry</span> and{" "}
+              <span className="font-bold text-gold-dark">Numerology</span>, we
+              reveal the deepest truths of your nature — your strengths, hidden
+              patterns, and the unique blueprint of your soul.
             </p>
-            <p className="text-charcoal/70 leading-relaxed text-base">
-              Beyond understanding who you are, we predict and advise on the future challenges and opportunities across
-              every dimension of your life:{' '}
-              <span className="font-medium text-charcoal/85">Finances &amp; Wealth</span>,{' '}
-              <span className="font-medium text-charcoal/85">Relationships &amp; Love</span>, and{' '}
-              <span className="font-medium text-charcoal/85">Family &amp; Home</span> — everything in rich, actionable
-              detail so you can navigate your path with clarity and confidence.
+            <p className="text-charcoal/70 leading-relaxed text-base text-center">
+              Beyond understanding who you are, we predict and advise on the
+              future challenges and opportunities across every dimension of your
+              life:{" "}
+              <span className="font-semibold text-charcoal/85">
+                Finances &amp; Wealth
+              </span>
+              ,{" "}
+              <span className="font-semibold text-charcoal/85">
+                Relationships &amp; Love
+              </span>
+              , and{" "}
+              <span className="font-semibold text-charcoal/85">
+                Family &amp; Home
+              </span>{" "}
+              — everything in rich, actionable detail so you can navigate your
+              path with clarity and confidence.
             </p>
             <div className="flex items-center justify-center gap-2 pt-2">
               <Hand size={15} className="text-gold/70" />
               <p className="text-sm text-charcoal/55 italic">
-                Share your palm photos, birth details, and your deepest questions — we'll do the rest.
+                Share your palm photos, birth details, and your deepest
+                questions — we'll do the rest.
               </p>
             </div>
           </div>
@@ -104,49 +136,63 @@ export default function SpecialUniqueServiceSection() {
               key={service.id}
               className={`card-hover rounded-2xl border-2 ${service.accentColor} p-7 flex flex-col shadow-spiritual`}
             >
-              {/* Icon + Fee */}
-              <div className="flex items-start justify-between mb-5">
+              {/* Badge pill at top — matches screenshot */}
+              <div className="mb-5">
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${service.badgeBg} ${service.badgeText} ${service.badgeBorder}`}
+                >
+                  {service.type}
+                </span>
+              </div>
+
+              {/* Icon + Fee row */}
+              <div className="flex items-start justify-between mb-4">
                 <div className="w-14 h-14 rounded-2xl bg-white/80 border border-gold/20 flex items-center justify-center text-gold-dark shadow-sm">
                   {service.icon}
                 </div>
                 <div className="text-right">
                   <div className="font-serif text-3xl font-bold text-gold-dark">
-                    ₹{service.fee.toLocaleString('en-IN')}
+                    ₹{service.fee.toLocaleString("en-IN")}
                   </div>
-                  <div className="text-xs text-charcoal/50 mt-0.5">per session</div>
+                  <div className="text-xs text-charcoal/50 mt-0.5">
+                    per session
+                  </div>
                 </div>
               </div>
 
-              {/* Badge */}
-              <span className={`self-start text-xs font-semibold px-2.5 py-1 rounded-full mb-3 ${service.badgeColor}`}>
-                {service.type}
-              </span>
-
               {/* Title */}
-              <h3 className="font-serif text-2xl font-semibold text-charcoal mb-3">{service.title}</h3>
+              <h3 className="font-serif text-2xl font-semibold text-charcoal mb-3">
+                {service.title}
+              </h3>
 
               {/* Description */}
-              <p className="text-sm text-charcoal/65 leading-relaxed flex-1 mb-6">{service.shortDesc}</p>
+              <p className="text-sm text-charcoal/65 leading-relaxed mb-5">
+                {service.shortDesc}
+              </p>
 
-              {/* What's included */}
-              <ul className="space-y-1.5 mb-6">
-                {[
-                  'Nature & personality analysis',
-                  'Financial & career outlook',
-                  'Relationship & family guidance',
-                  'Future problem advisory',
-                  'Palmistry + Numerology combined',
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-xs text-charcoal/65">
-                    <Star size={10} className="text-gold shrink-0" fill="currentColor" />
+              {/* Star bullet features — matching screenshot exactly */}
+              <ul className="space-y-2 mb-6 flex-1">
+                {includedFeatures.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-center gap-2 text-sm text-charcoal/70"
+                  >
+                    <Star
+                      size={12}
+                      className="text-gold shrink-0"
+                      fill="currentColor"
+                    />
                     {item}
                   </li>
                 ))}
               </ul>
 
-              {/* CTA Button */}
+              {/* CTA Button — teal/sage green */}
               <button
-                onClick={() => setActiveModal({ type: service.type, id: service.id })}
+                type="button"
+                onClick={() =>
+                  setActiveModal({ type: service.type, id: service.id })
+                }
                 className="btn-sage text-sm w-full py-3 font-medium"
               >
                 Book / Inquire

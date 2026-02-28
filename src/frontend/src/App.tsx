@@ -1,25 +1,30 @@
-import React, { useState } from 'react';
-import { Toaster } from '@/components/ui/sonner';
-import Header from './components/Header';
-import HeroSection from './components/HeroSection';
-import CoursesSection from './components/CoursesSection';
-import SpecialUniqueServiceSection from './components/SpecialUniqueServiceSection';
-import ServicesSection from './components/ServicesSection';
-import BlogSection from './components/BlogSection';
-import ComparisonTable from './components/ComparisonTable';
-import Footer from './components/Footer';
-import AdminDashboard from './components/AdminDashboard';
-import ProfileSetupModal from './components/ProfileSetupModal';
-import { useInternetIdentity } from './hooks/useInternetIdentity';
-import { useGetCallerUserProfile } from './hooks/useQueries';
+import { Toaster } from "@/components/ui/sonner";
+import React, { useState } from "react";
+import AdminDashboard from "./components/AdminDashboard";
+import BlogSection from "./components/BlogSection";
+import ComparisonTable from "./components/ComparisonTable";
+import CoursesSection from "./components/CoursesSection";
+import Footer from "./components/Footer";
+import Header from "./components/Header";
+import HeroSection from "./components/HeroSection";
+import ProfileSetupModal from "./components/ProfileSetupModal";
+import ServicesSection from "./components/ServicesSection";
+import SpecialUniqueServiceSection from "./components/SpecialUniqueServiceSection";
+import { useInternetIdentity } from "./hooks/useInternetIdentity";
+import { useGetCallerUserProfile } from "./hooks/useQueries";
 
 export default function App() {
   const [showAdmin, setShowAdmin] = useState(false);
   const { identity } = useInternetIdentity();
-  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
+  const {
+    data: userProfile,
+    isLoading: profileLoading,
+    isFetched,
+  } = useGetCallerUserProfile();
 
   const isAuthenticated = !!identity;
-  const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
+  const showProfileSetup =
+    isAuthenticated && !profileLoading && isFetched && userProfile === null;
 
   return (
     <div className="min-h-screen bg-background font-sans overflow-x-hidden w-full">

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -104,12 +104,17 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     overflow-x: hidden;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Cormorant Garamond', serif;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Cormorant Garamond", serif;
   }
 }
 
@@ -119,7 +124,7 @@
   }
 
   .btn-sage {
-    @apply bg-sage text-white font-medium px-6 py-2.5 rounded-sm transition-all duration-200 hover:bg-sage-dark hover:shadow-md hover:-translate-y-0.5 active:translate-y-0;
+    @apply inline-flex items-center justify-center rounded-lg px-6 py-3 font-medium text-white transition-all duration-200 cursor-pointer bg-sage hover:bg-sage-dark hover:shadow-md hover:-translate-y-0.5 active:translate-y-0;
   }
 
   .btn-outline-gold {
@@ -131,7 +136,7 @@
   }
 
   .section-heading {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: "Cormorant Garamond", serif;
     @apply text-4xl font-semibold text-gold-dark tracking-wide;
   }
 
