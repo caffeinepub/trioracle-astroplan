@@ -80,6 +80,7 @@ export interface _SERVICE {
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'checkAdmin' : ActorMethod<[], boolean>,
   'createPost' : ActorMethod<[string, string, string], bigint>,
+  'deleteInquiry' : ActorMethod<[bigint], undefined>,
   'deletePost' : ActorMethod<[bigint], undefined>,
   'getAllInquiries' : ActorMethod<[], Array<Inquiry>>,
   'getAllPosts' : ActorMethod<[], Array<Post>>,

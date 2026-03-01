@@ -1,4 +1,14 @@
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Download,
   Eye,
   Hash,
@@ -8,15 +18,17 @@ import {
   Mail,
   MapPin,
   RotateCcw,
+  Trash2,
   X,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
 import type React from "react";
 import { useCallback, useState } from "react";
+import { toast } from "sonner";
 import type { Inquiry } from "../backend";
 import type { ExternalBlob } from "../backend";
-import { useGetAllInquiries } from "../hooks/useQueries";
+import { useDeleteInquiry, useGetAllInquiries } from "../hooks/useQueries";
 
 // Helper: extract [EMAIL:xxx] prefix from question field
 function parseEmailFromQuestion(question: string): {
@@ -349,6 +361,71 @@ function SeedNumberBadge({ seedNumber }: { seedNumber: bigint }) {
   );
 }
 
+function DeleteInquiryButton({ inquiryId }: { inquiryId: bigint }) {
+  const [open, setOpen] = useState(false);
+  const { mutate: deleteInquiry, isPending } = useDeleteInquiry();
+
+  const handleConfirm = () => {
+    deleteInquiry(inquiryId, {
+      onSuccess: () => {
+        toast.success("Inquiry deleted successfully");
+        setOpen(false);
+      },
+      onError: () => {
+        toast.error("Failed to delete inquiry");
+        setOpen(false);
+      },
+    });
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        disabled={isPending}
+        className="inline-flex items-center gap-1 p-1.5 rounded-md text-charcoal/40 hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        title="Delete inquiry"
+      >
+        {isPending ? (
+          <Loader2 size={14} className="animate-spin" />
+        ) : (
+          <Trash2 size={14} />
+        )}
+      </button>
+
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this inquiry?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. The inquiry and all associated data
+              (including uploaded images) will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirm}
+              disabled={isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isPending ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <Loader2 size={13} className="animate-spin" />
+                  Deleting…
+                </span>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
+
 function SpecialServiceDetails({ inquiry }: { inquiry: Inquiry }) {
   const { cleanQuestion } = parseEmailFromQuestion(inquiry.question || "");
   return (
@@ -472,6 +549,9 @@ export default function InquiriesTab() {
               <th className="px-4 py-3 text-left font-semibold text-charcoal/70 text-xs uppercase tracking-wide">
                 Submitted
               </th>
+              <th className="px-4 py-3 text-left font-semibold text-charcoal/70 text-xs uppercase tracking-wide">
+                Action
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -568,6 +648,9 @@ export default function InquiriesTab() {
                   </td>
                   <td className="px-4 py-3 text-charcoal/50 text-xs whitespace-nowrap">
                     {formatDate(inquiry.submittedAt)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <DeleteInquiryButton inquiryId={inquiry.id} />
                   </td>
                 </tr>
               );
@@ -675,6 +758,11 @@ export default function InquiriesTab() {
                   {formatDate(inquiry.submittedAt)}
                 </div>
               )}
+
+              {/* Delete button — shown on all mobile cards */}
+              <div className="flex items-center justify-end pt-2 border-t border-gold/10">
+                <DeleteInquiryButton inquiryId={inquiry.id} />
+              </div>
             </div>
           );
         })}

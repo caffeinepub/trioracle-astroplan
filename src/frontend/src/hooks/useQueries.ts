@@ -232,6 +232,20 @@ export function useSubmitInquiry() {
   });
 }
 
+export function useDeleteInquiry() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: bigint) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.deleteInquiry(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inquiries"] });
+    },
+  });
+}
+
 // ── Admin Check ──────────────────────────────────────────────────────────────
 
 export function useCheckAdmin() {

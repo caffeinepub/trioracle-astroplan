@@ -61,6 +61,7 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     checkAdmin(): Promise<boolean>;
     createPost(title: string, content: string, author: string): Promise<bigint>;
+    deleteInquiry(id: bigint): Promise<void>;
     deletePost(id: bigint): Promise<void>;
     getAllInquiries(): Promise<Array<Inquiry>>;
     getAllPosts(): Promise<Array<Post>>;

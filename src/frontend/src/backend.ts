@@ -154,6 +154,7 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     checkAdmin(): Promise<boolean>;
     createPost(title: string, content: string, author: string): Promise<bigint>;
+    deleteInquiry(id: bigint): Promise<void>;
     deletePost(id: bigint): Promise<void>;
     getAllInquiries(): Promise<Array<Inquiry>>;
     getAllPosts(): Promise<Array<Post>>;
@@ -308,6 +309,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.createPost(arg0, arg1, arg2);
+            return result;
+        }
+    }
+    async deleteInquiry(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteInquiry(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteInquiry(arg0);
             return result;
         }
     }

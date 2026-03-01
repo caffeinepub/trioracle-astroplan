@@ -8,12 +8,12 @@ import Nat "mo:core/Nat";
 import Principal "mo:core/Principal";
 import Storage "blob-storage/Storage";
 
-
 import Authorization "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
+import Migration "migration";
 
-
+(with migration = Migration.run)
 actor {
   type Service = {
     id : Nat;
@@ -48,7 +48,7 @@ actor {
     birthCountry : ?Text;
     birthCity : ?Text;
     birthState : ?Text;
-    seedNumber : ?Nat; // <-- Added for seed number
+    seedNumber : ?Nat;
   };
 
   type UserProfile = {
@@ -212,7 +212,7 @@ actor {
     birthCountry : ?Text,
     birthCity : ?Text,
     birthState : ?Text,
-    seedNumber : ?Nat, // <-- Optional seed number
+    seedNumber : ?Nat,
   ) : async Nat {
     let inquiry : Inquiry = {
       id = nextInquiryId;
@@ -236,5 +236,12 @@ actor {
     inquiries.add(nextInquiryId, inquiry);
     nextInquiryId += 1;
     inquiry.id;
+  };
+
+  public shared ({ caller }) func deleteInquiry(id : Nat) : async () {
+    if (not Authorization.hasPermission(accessControlState, caller, #admin)) {
+      Runtime.trap("Unauthorized: Only admins can delete inquiries");
+    };
+    inquiries.remove(id);
   };
 };
