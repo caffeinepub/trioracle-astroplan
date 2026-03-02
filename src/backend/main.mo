@@ -11,9 +11,9 @@ import Storage "blob-storage/Storage";
 import Authorization "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
-import Migration "migration";
 
-(with migration = Migration.run)
+
+
 actor {
   type Service = {
     id : Nat;

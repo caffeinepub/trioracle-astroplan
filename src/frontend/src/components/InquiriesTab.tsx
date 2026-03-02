@@ -567,9 +567,7 @@ export default function InquiriesTab() {
                   key={inquiry.id.toString()}
                   className={`border-t border-gold/10 hover:bg-gold/5 ${idx % 2 === 0 ? "bg-white/60" : "bg-cream-bg/60"}`}
                 >
-                  <td className="px-4 py-3 text-charcoal/50">
-                    {inquiry.id.toString()}
-                  </td>
+                  <td className="px-4 py-3 text-charcoal/50">{idx + 1}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-1">
                       <span
