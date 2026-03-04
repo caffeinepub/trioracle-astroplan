@@ -11,7 +11,7 @@ export default function Footer() {
   const appId = encodeURIComponent(
     typeof window !== "undefined"
       ? window.location.hostname
-      : "astropulsee-destiny",
+      : "astroplam-desstiny",
   );
 
   return (
@@ -32,15 +32,18 @@ export default function Footer() {
             <div className="flex items-center gap-3 mb-4">
               <img
                 src="/assets/generated/trioracle-logo.dim_200x200.png"
-                alt="Astropulsee-destiny Logo"
+                alt="Astroplam-Desstiny Logo"
                 className="w-10 h-10 object-contain opacity-80"
               />
               <div>
                 <div className="font-serif text-xl font-bold text-gold">
-                  Astropulsee
+                  Astroplam
                 </div>
                 <div className="font-serif text-sm font-bold text-cream-bg/50">
-                  -<em>Destiny</em>
+                  -<em>Desstiny</em>
+                </div>
+                <div className="text-xs text-cream-bg/40 italic tracking-wide mt-0.5">
+                  by Viku Kharb
                 </div>
               </div>
             </div>
@@ -122,7 +125,7 @@ export default function Footer() {
           <p className="text-xs text-cream-bg/30">
             © {year}{" "}
             <strong className="font-bold text-cream-bg/40">
-              Astropulsee-<em>Destiny</em>
+              Astroplam-<em>Desstiny</em>
             </strong>
             . All rights reserved.
           </p>

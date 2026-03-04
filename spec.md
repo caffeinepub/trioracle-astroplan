@@ -1,28 +1,22 @@
 # AstroPulse - Destiny
 
 ## Current State
-Full-stack astrology website with Courses, Special Unique Service, Services, Blog, and Admin Dashboard. The Admin Dashboard has an Inquiries tab that lists all visitor inquiry submissions with full details (name, email, DOB/TOB, place of birth, question/notes, images). Currently there is no way for the admin to delete individual inquiries.
+Brand name "Astroplam-Desstiny" displayed in Header, HeroSection, and Footer without any author attribution.
 
 ## Requested Changes (Diff)
 
 ### Add
-- `deleteInquiry(id: Nat)` backend function — admin-only, permanently removes an inquiry by ID from the `inquiries` map
-- Delete button on each inquiry row in the Admin Dashboard (both desktop table and mobile cards)
-- Confirmation dialog before deletion — "Are you sure you want to delete this inquiry?" with Confirm and Cancel buttons
-- Optimistic UI update: remove the inquiry from the local list immediately on confirmation, with a loading state on the button
+- "by Viku Kharb" subtitle displayed beneath the brand name "Astroplam-Desstiny" in the Header, HeroSection, and Footer.
 
 ### Modify
-- `InquiriesTab.tsx` — add delete button + confirmation dialog UI, wire to `deleteInquiry` backend call, refresh inquiry list after deletion
-- `useQueries` hooks — add `useDeleteInquiry` mutation hook
+- Header: Brand name block now includes a second line "by Viku Kharb" in italic, smaller font below the main brand name.
+- HeroSection: Brand name heading now has "by Viku Kharb" displayed as a subtitle just below the h1 tag, centered.
+- Footer: Brand column now shows "by Viku Kharb" in small italic text below "-Desstiny".
 
 ### Remove
-- Nothing removed
+- Nothing removed.
 
 ## Implementation Plan
-1. Add `deleteInquiry(id: Nat)` to `main.mo` — admin-only, calls `inquiries.remove(id)`
-2. Add `useDeleteInquiry` mutation hook in the frontend hooks file
-3. In `InquiriesTab.tsx`:
-   - Add a Trash/Delete icon button at the end of each desktop table row and each mobile card
-   - On click, show an inline or modal confirmation dialog with "Are you sure?" + Confirm/Cancel buttons
-   - On Confirm: call `deleteInquiry`, remove inquiry from local state, show success toast
-   - On Cancel: dismiss dialog, no action
+1. Update Header.tsx — wrap brand name in a div, add a second line for "by Viku Kharb".
+2. Update HeroSection.tsx — wrap h1 in a div, add a paragraph below for "by Viku Kharb".
+3. Update Footer.tsx — add "by Viku Kharb" line below "-Desstiny" in the brand column.

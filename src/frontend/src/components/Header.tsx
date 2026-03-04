@@ -74,19 +74,24 @@ export default function Header({ onAdminClick }: HeaderProps) {
           >
             <img
               src="/assets/generated/trioracle-logo.dim_200x200.png"
-              alt="Astropulsee-destiny Logo"
+              alt="Astroplam-Desstiny Logo"
               className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 object-contain shrink-0"
             />
             <div className="leading-tight">
-              <span className="font-serif text-base sm:text-xl md:text-2xl font-bold text-gold-dark tracking-wide whitespace-nowrap">
-                Astropulsee
-              </span>
-              <span className="font-serif text-base sm:text-xl md:text-2xl font-bold text-charcoal/70 mx-1 whitespace-nowrap">
-                -
-              </span>
-              <span className="font-serif text-base sm:text-xl md:text-2xl font-bold text-charcoal/70 whitespace-nowrap italic">
-                Destiny
-              </span>
+              <div>
+                <span className="font-serif text-base sm:text-xl md:text-2xl font-bold text-gold-dark tracking-wide whitespace-nowrap">
+                  Astroplam
+                </span>
+                <span className="font-serif text-base sm:text-xl md:text-2xl font-bold text-charcoal/70 mx-1 whitespace-nowrap">
+                  -
+                </span>
+                <span className="font-serif text-base sm:text-xl md:text-2xl font-bold text-charcoal/70 whitespace-nowrap italic">
+                  Desstiny
+                </span>
+              </div>
+              <div className="text-xs sm:text-sm text-charcoal/50 font-medium italic tracking-wide whitespace-nowrap">
+                by Viku Kharb
+              </div>
             </div>
           </button>
 

@@ -111,7 +111,7 @@ export default function HeroSection() {
         </div>
 
         {/* Heading with large star to the left */}
-        <div className="flex items-center justify-center gap-3 sm:gap-5 mb-4">
+        <div className="flex items-center justify-center gap-3 sm:gap-5 mb-2">
           <Star
             size={40}
             className="text-gold shrink-0 hidden sm:block"
@@ -120,11 +120,16 @@ export default function HeroSection() {
               filter: "drop-shadow(0 2px 6px oklch(0.72 0.1 75 / 0.4))",
             }}
           />
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-charcoal leading-tight break-words">
-            <span className="text-gold-dark">Astropulsee</span>
-            <span className="text-charcoal/40 mx-2 sm:mx-3 font-bold">-</span>
-            <span className="italic">Destiny</span>
-          </h1>
+          <div className="text-center">
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-charcoal leading-tight break-words">
+              <span className="text-gold-dark">Astroplam</span>
+              <span className="text-charcoal/40 mx-2 sm:mx-3 font-bold">-</span>
+              <span className="italic">Desstiny</span>
+            </h1>
+            <p className="text-sm sm:text-base text-charcoal/50 font-medium italic tracking-widest mt-1">
+              by Viku Kharb
+            </p>
+          </div>
         </div>
 
         <p className="font-serif text-base sm:text-lg md:text-2xl text-charcoal/60 font-light italic mb-5 break-words">
