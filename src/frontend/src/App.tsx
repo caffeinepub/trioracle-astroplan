@@ -7,6 +7,8 @@ import CoursesSection from "./components/CoursesSection";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import HeroSection from "./components/HeroSection";
+import MatrimonialBanner from "./components/MatrimonialBanner";
+import MatrimonialPage from "./components/MatrimonialPage";
 import ProfileSetupModal from "./components/ProfileSetupModal";
 import ServicesSection from "./components/ServicesSection";
 import SpecialUniqueServiceSection from "./components/SpecialUniqueServiceSection";
@@ -15,6 +17,7 @@ import { useGetCallerUserProfile } from "./hooks/useQueries";
 
 export default function App() {
   const [showAdmin, setShowAdmin] = useState(false);
+  const [showMatrimonial, setShowMatrimonial] = useState(false);
   const { identity } = useInternetIdentity();
   const {
     data: userProfile,
@@ -28,13 +31,22 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background font-sans overflow-x-hidden w-full">
-      <Header onAdminClick={() => setShowAdmin(true)} />
+      <Header
+        onAdminClick={() => setShowAdmin(true)}
+        onMarriageClick={() => {
+          setShowAdmin(false);
+          setShowMatrimonial(true);
+        }}
+      />
 
       {showAdmin ? (
         <AdminDashboard onClose={() => setShowAdmin(false)} />
+      ) : showMatrimonial ? (
+        <MatrimonialPage onBack={() => setShowMatrimonial(false)} />
       ) : (
         <main className="overflow-x-hidden w-full">
           <HeroSection />
+          <MatrimonialBanner onNavigate={() => setShowMatrimonial(true)} />
           <section id="courses">
             <CoursesSection />
           </section>

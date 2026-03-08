@@ -6,9 +6,10 @@ import { useCheckAdmin, useGetCallerUserProfile } from "../hooks/useQueries";
 
 interface HeaderProps {
   onAdminClick: () => void;
+  onMarriageClick?: () => void;
 }
 
-export default function Header({ onAdminClick }: HeaderProps) {
+export default function Header({ onAdminClick, onMarriageClick }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { identity, login, clear, isLoggingIn } = useInternetIdentity();
@@ -54,6 +55,11 @@ export default function Header({ onAdminClick }: HeaderProps) {
     { label: "Blog", id: "blog" },
     { label: "Contact", id: "footer" },
   ];
+
+  const handleMarriageClick = () => {
+    setMobileOpen(false);
+    onMarriageClick?.();
+  };
 
   return (
     <header
@@ -108,6 +114,17 @@ export default function Header({ onAdminClick }: HeaderProps) {
                 <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-gold group-hover:w-full transition-all duration-300" />
               </button>
             ))}
+            {onMarriageClick && (
+              <button
+                type="button"
+                onClick={handleMarriageClick}
+                data-ocid="header.link"
+                className="text-charcoal/80 hover:text-gold-dark font-medium text-sm tracking-wide transition-colors duration-200 relative group whitespace-nowrap"
+              >
+                Marriage
+                <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-gold group-hover:w-full transition-all duration-300" />
+              </button>
+            )}
           </nav>
 
           {/* Auth Controls */}
@@ -173,6 +190,16 @@ export default function Header({ onAdminClick }: HeaderProps) {
               {link.label}
             </button>
           ))}
+          {onMarriageClick && (
+            <button
+              type="button"
+              onClick={handleMarriageClick}
+              data-ocid="header.link"
+              className="block w-full text-left text-charcoal/80 hover:text-gold-dark font-medium text-sm py-2 transition-colors"
+            >
+              Marriage
+            </button>
+          )}
           <div className="pt-2 border-t border-gold/10 flex flex-col gap-2">
             {isAuthenticated && userProfile && (
               <span className="text-sm text-charcoal/60 font-medium">

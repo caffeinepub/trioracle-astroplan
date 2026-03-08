@@ -1,10 +1,18 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, ClipboardList, Loader2, ShieldAlert, X } from "lucide-react";
+import {
+  Bell,
+  ClipboardList,
+  Heart,
+  Loader2,
+  ShieldAlert,
+  X,
+} from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import { useCheckAdmin, useGetAllInquiries } from "../hooks/useQueries";
 import BlogManagementTab from "./BlogManagementTab";
 import InquiriesTab from "./InquiriesTab";
+import MatrimonialTab from "./MatrimonialTab";
 
 interface AdminDashboardProps {
   onClose: () => void;
@@ -178,6 +186,14 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
             >
               Blog Management
             </TabsTrigger>
+            <TabsTrigger
+              value="matrimonial"
+              data-ocid="matrimonial.tab"
+              className="data-[state=active]:bg-gold data-[state=active]:text-white flex items-center gap-1.5"
+            >
+              <Heart size={13} />
+              Matrimonial
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="inquiries">
@@ -186,6 +202,10 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
 
           <TabsContent value="blog">
             <BlogManagementTab />
+          </TabsContent>
+
+          <TabsContent value="matrimonial">
+            <MatrimonialTab />
           </TabsContent>
         </Tabs>
       </div>
