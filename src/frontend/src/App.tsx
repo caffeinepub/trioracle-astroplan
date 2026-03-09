@@ -10,11 +10,14 @@ import HeroSection from "./components/HeroSection";
 import ProfileSetupModal from "./components/ProfileSetupModal";
 import ServicesSection from "./components/ServicesSection";
 import SpecialUniqueServiceSection from "./components/SpecialUniqueServiceSection";
+import VedicNumerologyApp from "./components/VedicNumerologyApp";
+import VedicNumerologySection from "./components/VedicNumerologySection";
 import { useInternetIdentity } from "./hooks/useInternetIdentity";
 import { useGetCallerUserProfile } from "./hooks/useQueries";
 
 export default function App() {
   const [showAdmin, setShowAdmin] = useState(false);
+  const [showNumerology, setShowNumerology] = useState(false);
   const { identity } = useInternetIdentity();
   const {
     data: userProfile,
@@ -35,6 +38,9 @@ export default function App() {
       ) : (
         <main className="overflow-x-hidden w-full">
           <HeroSection />
+          <section id="numerology">
+            <VedicNumerologySection onOpen={() => setShowNumerology(true)} />
+          </section>
           <section id="courses">
             <CoursesSection />
           </section>
@@ -52,6 +58,11 @@ export default function App() {
       )}
 
       <Footer />
+
+      {/* Vedic Numerology Full-screen App */}
+      {showNumerology && (
+        <VedicNumerologyApp onClose={() => setShowNumerology(false)} />
+      )}
 
       {showProfileSetup && <ProfileSetupModal />}
       <Toaster richColors position="top-right" />

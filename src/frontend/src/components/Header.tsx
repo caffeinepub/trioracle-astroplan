@@ -48,6 +48,7 @@ export default function Header({ onAdminClick }: HeaderProps) {
   };
 
   const navLinks = [
+    { label: "Numerology", id: "numerology" },
     { label: "Courses", id: "courses" },
     { label: "Special Services", id: "special-services" },
     { label: "Services", id: "services" },
@@ -96,13 +97,14 @@ export default function Header({ onAdminClick }: HeaderProps) {
           </button>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-5">
+          <nav className="hidden md:flex items-center gap-4 lg:gap-5">
             {navLinks.map((link) => (
               <button
                 type="button"
                 key={link.id}
                 onClick={() => scrollTo(link.id)}
                 className="text-charcoal/80 hover:text-gold-dark font-medium text-sm tracking-wide transition-colors duration-200 relative group whitespace-nowrap"
+                data-ocid={`nav.${link.id}.link`}
               >
                 {link.label}
                 <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-gold group-hover:w-full transition-all duration-300" />
@@ -169,6 +171,7 @@ export default function Header({ onAdminClick }: HeaderProps) {
               key={link.id}
               onClick={() => scrollTo(link.id)}
               className="block w-full text-left text-charcoal/80 hover:text-gold-dark font-medium text-sm py-2 transition-colors"
+              data-ocid={`nav.${link.id}.link`}
             >
               {link.label}
             </button>
