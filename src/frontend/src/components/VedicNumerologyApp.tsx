@@ -1,974 +1,1654 @@
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Toaster } from "@/components/ui/sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ArrowLeft,
-  BookmarkPlus,
-  Calculator,
+  BookOpen,
   ChevronDown,
-  ChevronUp,
+  Loader2,
+  Lock,
+  LogIn,
+  LogOut,
+  Settings,
+  Sparkles,
+  Stars,
   Trash2,
-  X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { AuthProvider, useAuth } from "../contexts/AuthContext";
+import {
+  type Chart,
+  useCreateChart,
+  useDeleteChart,
+  useGetAllCharts,
+  useLoginUser,
+} from "../hooks/useVedicQueries";
+import {
+  type NumerologyResult,
+  calculateNumerology,
+  formatDOB,
+  getMonthName,
+  validateDOB,
+} from "../utils/numerology";
+import { NatalChart } from "./NatalChart";
+import PredictionPanel from "./PredictionPanel";
+import { VedicAdminPanel } from "./VedicAdminPanel";
+import { YearChartGrid } from "./YearChartGrid";
+import { YearScrollPicker } from "./YearScrollPicker";
 
-// ─────────────────────────────────────────────
-interface DOB {
-  day: number;
-  month: number;
-  year: number;
+interface DOBState {
+  day: string;
+  month: string;
+  year: string;
 }
 
-interface NatalChartData {
-  counts: Record<number, number>;
-  basicNumber: number;
-  destinyNumber: number;
-  monthNumber: number;
-}
-
-interface DasaPeriod {
-  dasaNumber: number;
-  startYear: number;
-  endYear: number;
-}
-
-interface SavedChart {
-  id: string;
-  name: string;
-  dob: DOB;
-  savedAt: string;
-}
-
-interface YearChartData {
-  year: number;
-  yearNumber: number;
-  labelStart: string;
-  labelEnd: string;
-}
-
-// ─────────────────────────────────────────────
-// Utility: reduce to single digit 1-9
-// ─────────────────────────────────────────────
-function reduceDigits(n: number): number {
-  if (n <= 0) return 0;
-  let val = n;
-  while (val > 9) {
-    val = String(val)
-      .split("")
-      .reduce((acc, d) => acc + Number.parseInt(d, 10), 0);
-  }
-  return val;
-}
-
-// ─────────────────────────────────────────────
-// Natal Chart Calculation
-// ─────────────────────────────────────────────
-function computeNatalChart(dob: DOB): NatalChartData {
-  const { day, month, year } = dob;
-
-  const basicNumber = reduceDigits(day);
-  const monthNumber = reduceDigits(month);
-
-  // Year: only last 2 digits, skip zeros
-  const yearStr = String(year).padStart(4, "0");
-  const lastTwo = yearStr.slice(-2);
-  const yearDigits: number[] = [];
-  for (const ch of lastTwo) {
-    const digit = Number.parseInt(ch, 10);
-    if (digit !== 0) yearDigits.push(digit);
-  }
-
-  // Destiny: sum ALL digits of full DOB (dd + mm + yyyy)
-  const allDigits = String(day)
-    .padStart(2, "0")
-    .split("")
-    .map(Number)
-    .concat(String(month).padStart(2, "0").split("").map(Number))
-    .concat(String(year).padStart(4, "0").split("").map(Number));
-  const rawDestiny = allDigits.reduce((a, b) => a + b, 0);
-  const destinyNumber = reduceDigits(rawDestiny);
-
-  const counts: Record<number, number> = {};
-  const add = (num: number) => {
-    if (num < 1 || num > 9) return;
-    counts[num] = (counts[num] || 0) + 1;
-  };
-
-  add(basicNumber);
-  add(monthNumber);
-  yearDigits.forEach(add);
-  add(destinyNumber);
-
-  return { counts, basicNumber, destinyNumber, monthNumber };
-}
-
-// ─────────────────────────────────────────────
-// Dasa 45-year Cycle
-// ─────────────────────────────────────────────
-function computeDasaTimeline(dob: DOB): DasaPeriod[] {
-  const { day, month, year } = dob;
-  const basicNumber = reduceDigits(day);
-
-  const sequence: number[] = [];
-  let dasaNum = basicNumber;
-  let total = 0;
-  while (total < 45) {
-    const duration = dasaNum;
-    if (total + duration > 45) break;
-    sequence.push(dasaNum);
-    total += duration;
-    dasaNum = dasaNum === 9 ? 1 : dasaNum + 1;
-  }
-
-  const periods: DasaPeriod[] = [];
-  let cursor = new Date(year, month - 1, day);
-
-  for (const num of sequence) {
-    const startYear = cursor.getFullYear();
-    const endDate = new Date(cursor);
-    endDate.setFullYear(endDate.getFullYear() + num);
-    const endYear = endDate.getFullYear();
-    periods.push({ dasaNumber: num, startYear, endYear });
-    cursor = endDate;
-  }
-
-  return periods;
-}
-
-function getCurrentDasa(periods: DasaPeriod[]): DasaPeriod | null {
-  const now = new Date().getFullYear();
-  return (
-    periods.find((p) => now >= p.startYear && now < p.endYear) ||
-    periods[periods.length - 1] ||
-    null
-  );
-}
-
-// ─────────────────────────────────────────────
-// Day-of-week number mapping
-// ─────────────────────────────────────────────
-const DOW_NUMBERS: Record<number, number> = {
-  0: 1, // Sunday
-  1: 2, // Monday
-  2: 9, // Tuesday
-  3: 5, // Wednesday
-  4: 3, // Thursday
-  5: 6, // Friday
-  6: 8, // Saturday
-};
-
-// ─────────────────────────────────────────────
-// Year Number Calculation
-// ─────────────────────────────────────────────
-function computeYearNumber(dob: DOB, targetYear: number): YearChartData {
-  const { day, month } = dob;
-  const lastTwo = Number.parseInt(String(targetYear).slice(-2), 10);
-  const birthDateThisYear = new Date(targetYear, month - 1, day);
-  const dow = birthDateThisYear.getDay();
-  const dowNum = DOW_NUMBERS[dow] ?? 1;
-  const raw = day + month + lastTwo + dowNum;
-  const yearNumber = reduceDigits(raw);
-
-  const startDate = new Date(targetYear, month - 1, day);
-  const endDate = new Date(targetYear + 1, month - 1, day);
-  const fmt = (d: Date) =>
-    `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
-
-  return {
-    year: targetYear,
-    yearNumber,
-    labelStart: fmt(startDate),
-    labelEnd: fmt(endDate),
-  };
-}
-
-// ─────────────────────────────────────────────
-// Chart Grid Component
-// ─────────────────────────────────────────────
-const GRID_LAYOUT: number[][] = [
-  [3, 1, 9],
-  [6, 7, 5],
-  [2, 8, 4],
-];
-
-interface ChartGridProps {
-  natalCounts: Record<number, number>;
-  dasaNumber?: number | null;
-  yearNumber?: number | null;
-  size?: "sm" | "md" | "lg";
-}
-
-function ChartGrid({
-  natalCounts,
-  dasaNumber,
-  yearNumber,
-  size = "md",
-}: ChartGridProps) {
-  const cellSize =
-    size === "sm"
-      ? "w-14 h-14 text-base"
-      : size === "lg"
-        ? "w-24 h-24 sm:w-28 sm:h-28 text-2xl"
-        : "w-20 h-20 sm:w-24 sm:h-24 text-xl";
-
-  return (
-    <div
-      className="inline-grid grid-cols-3 gap-1.5"
-      aria-label="Natal Chart Grid"
-    >
-      {GRID_LAYOUT.map((row) =>
-        row.map((cellNum) => {
-          const natCount = natalCounts[cellNum] || 0;
-          const hasDasa = dasaNumber === cellNum;
-          const hasYear = yearNumber === cellNum;
-
-          const dasaDisplay = hasDasa
-            ? natCount > 0
-              ? String(cellNum).repeat(2)
-              : String(cellNum)
-            : null;
-
-          const yearDisplay = hasYear ? String(cellNum) : null;
-
-          return (
-            <div
-              key={`cell-${cellNum}`}
-              className={`${cellSize} border-2 border-gold/60 bg-white/70 rounded-lg flex flex-col items-center justify-center relative overflow-hidden shadow-xs`}
-              aria-label={`Cell ${cellNum}`}
-            >
-              {/* Natal numbers — dark, large */}
-              {natCount > 0 && (
-                <span className="font-bold font-serif text-charcoal leading-none tracking-tight">
-                  {String(cellNum).repeat(natCount)}
-                </span>
-              )}
-
-              {/* Dasa overlay — white, top-right */}
-              {dasaDisplay && (
-                <span
-                  className="absolute top-1 right-1 font-bold text-xs leading-none"
-                  style={{
-                    color: "#ffffff",
-                    textShadow: "0 1px 3px rgba(0,0,0,0.7)",
-                  }}
-                  title={`Dasa: ${dasaDisplay}`}
-                >
-                  {dasaDisplay}
-                </span>
-              )}
-
-              {/* Year number — green, bottom-left */}
-              {yearDisplay && (
-                <span
-                  className="absolute bottom-1 left-1 font-bold text-xs leading-none"
-                  style={{ color: "#2a9d8f" }}
-                  title={`Year: ${yearDisplay}`}
-                >
-                  {yearDisplay}
-                </span>
-              )}
-
-              {/* Empty cell hint */}
-              {natCount === 0 && !hasDasa && !hasYear && (
-                <span className="text-gold/20 font-serif text-lg">
-                  {cellNum}
-                </span>
-              )}
-            </div>
-          );
-        }),
-      )}
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// Main App Component
-// ─────────────────────────────────────────────
 interface VedicNumerologyAppProps {
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export default function VedicNumerologyApp({
   onClose,
 }: VedicNumerologyAppProps) {
-  const [day, setDay] = useState("");
-  const [month, setMonth] = useState("");
-  const [yearInput, setYearInput] = useState("");
-  const [yearRangeStart, setYearRangeStart] = useState("");
-  const [yearRangeEnd, setYearRangeEnd] = useState("");
+  return (
+    <AuthProvider>
+      <AppInner onClose={onClose} />
+    </AuthProvider>
+  );
+}
+
+function SummaryPill({
+  label,
+  value,
+  color,
+}: { label: string; value: number; color: string }) {
+  return (
+    <div className="flex flex-col items-center gap-0.5">
+      <span
+        className="font-body text-xs uppercase tracking-widest"
+        style={{ color: "oklch(var(--muted-foreground))" }}
+      >
+        {label}
+      </span>
+      <span className="font-display text-3xl font-bold" style={{ color }}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function AppInner({ onClose }: { onClose?: () => void }) {
+  const { auth, login, loginAdmin, logout, sectionLevel } = useAuth();
+
+  const [dob, setDob] = useState<DOBState>({ day: "", month: "", year: "" });
+  const [result, setResult] = useState<NumerologyResult | null>(null);
+  const [dobError, setDobError] = useState<string | null>(null);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [saveName, setSaveName] = useState("");
-  const [showSaveInput, setShowSaveInput] = useState(false);
-  const [expandedDasa, setExpandedDasa] = useState(false);
-  const [calculatedDOB, setCalculatedDOB] = useState<DOB | null>(null);
-  const [error, setError] = useState("");
+  const [selectedSaved, setSelectedSaved] = useState<Chart | null>(null);
+  const [activeTab, setActiveTab] = useState("new");
 
-  const [savedCharts, setSavedCharts] = useState<SavedChart[]>(() => {
-    try {
-      const raw = localStorage.getItem("vedic-numerology-charts");
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
+  const [fromYear, setFromYear] = useState<number>(new Date().getFullYear());
+  const [toYear, setToYear] = useState<number>(new Date().getFullYear() + 44);
+  const [showYearCharts, setShowYearCharts] = useState(false);
+
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginIsAdmin, setLoginIsAdmin] = useState(false);
+  const [showMonthGate, setShowMonthGate] = useState(false);
+
+  const [p1Dob, setP1Dob] = useState<DOBState>({
+    day: "",
+    month: "",
+    year: "",
   });
+  const [p2Dob, setP2Dob] = useState<DOBState>({
+    day: "",
+    month: "",
+    year: "",
+  });
+  const [_compFromYear, _setCompFromYear] = useState<number>(
+    new Date().getFullYear(),
+  );
+  const [_compToYear, _setCompToYear] = useState<number>(
+    new Date().getFullYear() + 44,
+  );
+  const [showComparison, setShowComparison] = useState(false);
+  const [compError, setCompError] = useState<string | null>(null);
+  const [p1Result, setP1Result] = useState<NumerologyResult | null>(null);
+  const [p2Result, setP2Result] = useState<NumerologyResult | null>(null);
+  const [compareChartTab, setCompareChartTab] = useState<"natal" | "year">(
+    "natal",
+  );
 
-  const [selectedSaved, setSelectedSaved] = useState<SavedChart | null>(null);
+  const [dobMD, setDobMD] = useState({ day: "", month: "", year: "" });
+  const [dobMDError, setDobMDError] = useState("");
+  const [resultMD, setResultMD] = useState<NumerologyResult | null>(null);
+  const [fromYearMD, setFromYearMD] = useState<number>(
+    new Date().getFullYear(),
+  );
+  const [toYearMD, setToYearMD] = useState<number>(
+    new Date().getFullYear() + 10,
+  );
+  const [showYearChartsMD, setShowYearChartsMD] = useState(false);
 
-  const handleCalculate = () => {
-    setError("");
-    const d = Number.parseInt(day, 10);
-    const m = Number.parseInt(month, 10);
-    const y = Number.parseInt(yearInput, 10);
+  const loginUser = useLoginUser();
+  const { data: charts = [], isLoading: chartsLoading } = useGetAllCharts();
+  const createChart = useCreateChart();
+  const deleteChart = useDeleteChart();
 
-    if (!day || !month || !yearInput) {
-      setError("Please enter a complete date of birth.");
+  const dayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
+  const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
+
+  function handleShowChart() {
+    const day = Number.parseInt(dob.day, 10);
+    const month = Number.parseInt(dob.month, 10);
+    const year = Number.parseInt(dob.year, 10);
+    if (!dob.day || !dob.month || !dob.year) {
+      setDobError("Please select a complete date of birth.");
       return;
     }
-    if (d < 1 || d > 31 || m < 1 || m > 12 || y < 1 || y > 9999) {
-      setError("Please enter a valid date.");
+    const validationError = validateDOB(day, month, year);
+    if (validationError) {
+      setDobError(validationError);
       return;
     }
-    const testDate = new Date(y, m - 1, d);
+    setDobError(null);
+    const numerology = calculateNumerology(formatDOB(day, month, year));
+    setResult(numerology);
+    setShowYearCharts(false);
+  }
+
+  function handleShowComparison() {
+    const d1 = Number.parseInt(p1Dob.day, 10);
+    const m1 = Number.parseInt(p1Dob.month, 10);
+    const y1 = Number.parseInt(p1Dob.year, 10);
+    const d2 = Number.parseInt(p2Dob.day, 10);
+    const m2 = Number.parseInt(p2Dob.month, 10);
+    const y2 = Number.parseInt(p2Dob.year, 10);
     if (
-      testDate.getFullYear() !== y ||
-      testDate.getMonth() !== m - 1 ||
-      testDate.getDate() !== d
+      !p1Dob.day ||
+      !p1Dob.month ||
+      !p1Dob.year ||
+      !p2Dob.day ||
+      !p2Dob.month ||
+      !p2Dob.year
     ) {
-      setError("Invalid date — please check the day/month/year.");
+      setCompError("Please fill in both dates of birth.");
       return;
     }
+    const e1 = validateDOB(d1, m1, y1);
+    const e2 = validateDOB(d2, m2, y2);
+    if (e1 || e2) {
+      setCompError(e1 || e2 || "Invalid date.");
+      return;
+    }
+    setCompError(null);
+    setP1Result(calculateNumerology(formatDOB(d1, m1, y1)));
+    setP2Result(calculateNumerology(formatDOB(d2, m2, y2)));
+    setShowComparison(true);
+  }
 
-    setCalculatedDOB({ day: d, month: m, year: y });
-    if (!yearRangeStart) setYearRangeStart(String(y));
-    if (!yearRangeEnd) setYearRangeEnd(String(y + 9));
-  };
-
-  const natalData = useMemo(
-    () => (calculatedDOB ? computeNatalChart(calculatedDOB) : null),
-    [calculatedDOB],
-  );
-
-  const dasaPeriods = useMemo(
-    () => (calculatedDOB ? computeDasaTimeline(calculatedDOB) : []),
-    [calculatedDOB],
-  );
-
-  const currentDasa = useMemo(() => getCurrentDasa(dasaPeriods), [dasaPeriods]);
-
-  const yearCharts = useMemo(() => {
-    if (!calculatedDOB) return [];
-    const rs = Number.parseInt(yearRangeStart, 10);
-    const re = Number.parseInt(yearRangeEnd, 10);
-    if (!rs || !re || rs > re) return [];
-    const range = Math.min(re - rs + 1, 100);
-    return Array.from({ length: range }, (_, i) =>
-      computeYearNumber(calculatedDOB, rs + i),
+  async function handleSaveConfirm() {
+    if (!result || !saveName.trim()) return;
+    const dobStr = formatDOB(
+      Number.parseInt(dob.day, 10),
+      Number.parseInt(dob.month, 10),
+      Number.parseInt(dob.year, 10),
     );
-  }, [calculatedDOB, yearRangeStart, yearRangeEnd]);
+    try {
+      await createChart.mutateAsync({
+        name: saveName.trim(),
+        dob: dobStr,
+        basicNumber: result.basicNumber,
+        destinyNumber: result.destinyNumber,
+        chartNumbers: result.chartNumbers,
+      });
+      setSaveDialogOpen(false);
+      setSaveName("");
+      toast.success("Chart saved successfully!");
+    } catch {
+      toast.error("Failed to save chart. Please try again.");
+    }
+  }
 
-  const handleSave = useCallback(() => {
-    if (!calculatedDOB || !saveName.trim()) return;
-    const chart: SavedChart = {
-      id: `${Date.now()}`,
-      name: saveName.trim(),
-      dob: calculatedDOB,
-      savedAt: new Date().toLocaleDateString(),
-    };
-    const updated = [chart, ...savedCharts];
-    setSavedCharts(updated);
-    localStorage.setItem("vedic-numerology-charts", JSON.stringify(updated));
-    setSaveName("");
-    setShowSaveInput(false);
-  }, [calculatedDOB, saveName, savedCharts]);
-
-  const handleDeleteSaved = useCallback(
-    (id: string) => {
-      const updated = savedCharts.filter((c) => c.id !== id);
-      setSavedCharts(updated);
-      localStorage.setItem("vedic-numerology-charts", JSON.stringify(updated));
+  async function handleDeleteChart(e: React.MouseEvent, id: bigint) {
+    e.stopPropagation();
+    try {
+      await deleteChart.mutateAsync(id);
       if (selectedSaved?.id === id) setSelectedSaved(null);
-    },
-    [savedCharts, selectedSaved],
-  );
+      toast.success("Chart deleted.");
+    } catch {
+      toast.error("Failed to delete chart.");
+    }
+  }
 
-  const handleLoadSaved = useCallback((chart: SavedChart) => {
-    setSelectedSaved(chart);
-    setCalculatedDOB(chart.dob);
-    setDay(String(chart.dob.day));
-    setMonth(String(chart.dob.month));
-    setYearInput(String(chart.dob.year));
-    const rs = chart.dob.year;
-    setYearRangeStart(String(rs));
-    setYearRangeEnd(String(rs + 9));
-  }, []);
+  function getSavedResult(chart: Chart): NumerologyResult {
+    const chartNumbers = chart.chartNumbers.map(Number);
+    const cellCounts: Record<number, number> = {};
+    for (let i = 1; i <= 9; i++) cellCounts[i] = 0;
+    for (const n of chartNumbers)
+      if (n >= 1 && n <= 9) cellCounts[n] = (cellCounts[n] || 0) + 1;
+    return {
+      basicNumber: Number(chart.basicNumber),
+      destinyNumber: Number(chart.destinyNumber),
+      chartNumbers,
+      cellCounts,
+    };
+  }
 
-  const dobLabel = calculatedDOB
-    ? `${String(calculatedDOB.day).padStart(2, "0")}/${String(calculatedDOB.month).padStart(2, "0")}/${calculatedDOB.year}`
-    : null;
+  function openLoginModal(asAdmin = false) {
+    setLoginIsAdmin(asAdmin);
+    setLoginUsername("");
+    setLoginPassword("");
+    setLoginError(null);
+    setLoginOpen(true);
+  }
 
-  // Silence unused variable warning from selectedSaved being set but only read for deletion
-  void selectedSaved;
+  async function handleLoginSubmit() {
+    if (!loginUsername.trim() || !loginPassword.trim()) {
+      setLoginError("Please enter both username and password.");
+      return;
+    }
+    if (loginIsAdmin) {
+      const ok = loginAdmin(loginUsername.trim(), loginPassword.trim());
+      if (ok) {
+        setLoginOpen(false);
+        setShowAdminPanel(true);
+        toast.success("Welcome, Admin!");
+      } else setLoginError("Invalid admin credentials.");
+      return;
+    }
+    try {
+      const level = await loginUser.mutateAsync({
+        username: loginUsername.trim(),
+        password: loginPassword.trim(),
+      });
+      login(loginUsername.trim(), level);
+      setLoginOpen(false);
+      toast.success(`Welcome back, ${loginUsername.trim()}!`);
+    } catch {
+      setLoginError("Invalid username or password.");
+    }
+  }
+
+  if (showAdminPanel) {
+    return (
+      <>
+        <Toaster position="top-right" />
+        <VedicAdminPanel onBack={() => setShowAdminPanel(false)} />
+      </>
+    );
+  }
 
   return (
-    <AnimatePresence>
-      <motion.div
-        className="fixed inset-0 z-50 bg-cream-bg overflow-y-auto"
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 40 }}
-        transition={{ duration: 0.3 }}
-        data-ocid="numerology.modal"
-      >
-        {/* Header Bar */}
-        <div className="sticky top-0 z-10 bg-cream-bg/95 backdrop-blur-sm border-b border-gold/20 px-4 py-3 flex items-center justify-between shadow-xs">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex items-center gap-1.5 text-charcoal/70 hover:text-gold-dark transition-colors text-sm font-medium"
-            data-ocid="numerology.close_button"
-          >
-            <ArrowLeft size={16} />
-            Back
-          </button>
+    <div className="relative min-h-screen flex flex-col z-10">
+      <Toaster position="top-right" />
 
-          <div className="text-center">
-            <h1 className="font-serif text-lg sm:text-xl font-bold text-gold-dark">
-              Vedic Numerology
-            </h1>
-            <p className="text-xs text-charcoal/50">Natal Chart Calculator</p>
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-charcoal/40 hover:text-charcoal/70 transition-colors"
-            data-ocid="numerology.close_button"
-            aria-label="Close"
-          >
-            <X size={18} />
-          </button>
+      {/* Header */}
+      <header className="relative pt-6 pb-4 text-center">
+        <div className="absolute top-3 left-3">
+          {onClose && (
+            <button
+              type="button"
+              data-ocid="vedic_app.close_button"
+              onClick={onClose}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-body font-semibold transition-colors"
+              style={{
+                background: "oklch(var(--secondary))",
+                color: "oklch(var(--muted-foreground))",
+                border: "1px solid oklch(var(--border))",
+              }}
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> Back
+            </button>
+          )}
+        </div>
+        <div className="absolute top-3 right-3 flex items-center gap-2">
+          {auth ? (
+            <>
+              <span
+                className="font-body text-xs hidden sm:block"
+                style={{ color: "oklch(var(--muted-foreground))" }}
+              >
+                {auth.isAdmin ? "Admin" : auth.username}
+              </span>
+              {auth.isAdmin && (
+                <button
+                  type="button"
+                  data-ocid="vedic_admin_panel.open_modal_button"
+                  onClick={() => setShowAdminPanel(true)}
+                  className="p-1.5 rounded-md transition-colors"
+                  style={{ color: "oklch(var(--primary))" }}
+                  title="Open Admin Panel"
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
+              )}
+              <button
+                type="button"
+                data-ocid="vedic_auth.toggle"
+                onClick={logout}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-body font-semibold transition-colors"
+                style={{
+                  background: "oklch(var(--secondary))",
+                  color: "oklch(var(--muted-foreground))",
+                  border: "1px solid oklch(var(--border))",
+                }}
+              >
+                <LogOut className="w-3.5 h-3.5" /> Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                data-ocid="vedic_admin_login.open_modal_button"
+                onClick={() => openLoginModal(true)}
+                className="font-body text-[10px] opacity-40 hover:opacity-70 transition-opacity"
+                style={{ color: "oklch(var(--muted-foreground))" }}
+              >
+                Admin
+              </button>
+              <button
+                type="button"
+                data-ocid="vedic_login.open_modal_button"
+                onClick={() => openLoginModal(false)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-body font-semibold transition-colors"
+                style={{
+                  background: "oklch(var(--primary))",
+                  color: "oklch(var(--primary-foreground))",
+                }}
+              >
+                <LogIn className="w-3.5 h-3.5" /> Login
+              </button>
+            </>
+          )}
         </div>
 
-        {/* Main Content */}
-        <div className="max-w-5xl mx-auto px-4 py-6">
-          <Tabs defaultValue="new">
-            <TabsList className="grid w-full grid-cols-2 max-w-xs mx-auto mb-6 bg-lavender/30">
-              <TabsTrigger value="new" data-ocid="numerology.tab">
-                New
-              </TabsTrigger>
-              <TabsTrigger value="saved" data-ocid="numerology.tab">
-                Saved ({savedCharts.length})
-              </TabsTrigger>
-            </TabsList>
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <h1
+            className="font-display text-3xl sm:text-4xl font-bold tracking-wide"
+            style={{
+              color: "oklch(0.72 0.14 75)",
+              textShadow: "0 1px 8px oklch(0.62 0.12 75 / 0.25)",
+            }}
+          >
+            ✧ Vedic Numerology ✧
+          </h1>
+        </div>
+        <p
+          className="font-body text-xs tracking-[0.25em] uppercase font-semibold"
+          style={{
+            color: "oklch(0.62 0.09 75)",
+            fontVariant: "small-caps",
+            letterSpacing: "0.28em",
+          }}
+        >
+          Ancient Numbers · Modern Insight
+        </p>
+      </header>
 
-            {/* ── NEW TAB ── */}
-            <TabsContent value="new">
-              {/* DOB Input Form */}
-              <div className="bg-white/60 border border-gold/20 rounded-xl p-5 mb-6 shadow-xs">
-                <h2 className="font-serif text-lg font-semibold text-gold-dark mb-4">
+      {/* Main Content */}
+      <main className="flex-1 px-4 pb-16 max-w-lg mx-auto w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList
+            className="w-full mb-6 text-xs"
+            style={{
+              background: "oklch(var(--secondary))",
+              border: "1px solid oklch(var(--border))",
+            }}
+          >
+            <TabsTrigger
+              value="new"
+              data-ocid="vedic_new_tab.tab"
+              className="flex-1 font-body data-[state=active]:font-semibold px-1"
+            >
+              New
+            </TabsTrigger>
+            <TabsTrigger
+              value="saved"
+              data-ocid="vedic_saved_tab.tab"
+              className="flex-1 font-body data-[state=active]:font-semibold px-1"
+            >
+              Saved
+            </TabsTrigger>
+            <TabsTrigger
+              value="comparison"
+              data-ocid="vedic_comparison_tab.tab"
+              className="flex-1 font-body data-[state=active]:font-semibold px-1"
+            >
+              Compare
+            </TabsTrigger>
+            <TabsTrigger
+              value="monthdays"
+              data-ocid="vedic_monthdays_tab.tab"
+              className="flex-1 font-body data-[state=active]:font-semibold px-1"
+            >
+              Months
+            </TabsTrigger>
+            <TabsTrigger
+              value="predictions"
+              data-ocid="vedic_predictions_tab.tab"
+              className="flex-1 font-body data-[state=active]:font-semibold px-1"
+            >
+              Predict
+            </TabsTrigger>
+          </TabsList>
+
+          {/* New Chart Tab */}
+          <TabsContent value="new" className="space-y-6 mt-0">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div
+                className="rounded-lg p-5"
+                style={{
+                  background: "oklch(var(--card))",
+                  border: "1px solid oklch(var(--border))",
+                }}
+              >
+                <h2
+                  className="font-display text-lg font-semibold mb-4"
+                  style={{ color: "oklch(var(--primary))" }}
+                >
                   Enter Date of Birth
                 </h2>
-
                 <div className="grid grid-cols-3 gap-3 mb-4">
-                  <div>
+                  <div className="space-y-1.5">
                     <Label
-                      htmlFor="dob-day"
-                      className="text-xs text-charcoal/60 mb-1 block"
+                      className="text-xs uppercase tracking-wider font-body"
+                      style={{ color: "oklch(var(--muted-foreground))" }}
                     >
-                      Day (DD)
+                      Day
                     </Label>
-                    <Input
-                      id="dob-day"
-                      type="number"
-                      min={1}
-                      max={31}
-                      placeholder="05"
-                      value={day}
-                      onChange={(e) => setDay(e.target.value)}
-                      className="text-center font-mono"
-                      data-ocid="numerology.input"
-                    />
+                    <select
+                      data-ocid="vedic_dob_day.input"
+                      value={dob.day}
+                      onChange={(e) =>
+                        setDob((prev) => ({ ...prev, day: e.target.value }))
+                      }
+                      className="w-full h-9 px-3 rounded-md text-sm font-body appearance-none cursor-pointer"
+                      style={{
+                        background: "oklch(var(--input))",
+                        border: "1px solid oklch(var(--border))",
+                        color: dob.day
+                          ? "oklch(var(--foreground))"
+                          : "oklch(var(--muted-foreground))",
+                      }}
+                    >
+                      <option value="" disabled>
+                        DD
+                      </option>
+                      {dayOptions.map((d) => (
+                        <option key={d} value={String(d)}>
+                          {String(d).padStart(2, "0")}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                  <div>
+                  <div className="space-y-1.5">
                     <Label
-                      htmlFor="dob-month"
-                      className="text-xs text-charcoal/60 mb-1 block"
+                      className="text-xs uppercase tracking-wider font-body"
+                      style={{ color: "oklch(var(--muted-foreground))" }}
                     >
-                      Month (MM)
+                      Month
                     </Label>
-                    <Input
-                      id="dob-month"
-                      type="number"
-                      min={1}
-                      max={12}
-                      placeholder="02"
-                      value={month}
-                      onChange={(e) => setMonth(e.target.value)}
-                      className="text-center font-mono"
-                      data-ocid="numerology.input"
-                    />
+                    <select
+                      data-ocid="vedic_dob_month.input"
+                      value={dob.month}
+                      onChange={(e) =>
+                        setDob((prev) => ({ ...prev, month: e.target.value }))
+                      }
+                      className="w-full h-9 px-3 rounded-md text-sm font-body appearance-none cursor-pointer"
+                      style={{
+                        background: "oklch(var(--input))",
+                        border: "1px solid oklch(var(--border))",
+                        color: dob.month
+                          ? "oklch(var(--foreground))"
+                          : "oklch(var(--muted-foreground))",
+                      }}
+                    >
+                      <option value="" disabled>
+                        MM
+                      </option>
+                      {monthOptions.map((m) => (
+                        <option key={m} value={String(m)}>
+                          {getMonthName(m)}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                  <div>
+                  <div className="space-y-1.5">
                     <Label
-                      htmlFor="dob-year"
-                      className="text-xs text-charcoal/60 mb-1 block"
+                      className="text-xs uppercase tracking-wider font-body"
+                      style={{ color: "oklch(var(--muted-foreground))" }}
                     >
-                      Year (YYYY)
+                      Year
                     </Label>
-                    <Input
-                      id="dob-year"
-                      type="number"
-                      min={1}
-                      max={9999}
-                      placeholder="1998"
-                      value={yearInput}
-                      onChange={(e) => setYearInput(e.target.value)}
-                      className="text-center font-mono"
-                      data-ocid="numerology.input"
+                    <YearScrollPicker
+                      value={dob.year}
+                      onChange={(v) => setDob((prev) => ({ ...prev, year: v }))}
                     />
                   </div>
                 </div>
 
-                {error && (
+                {dobError && (
                   <p
-                    className="text-red-500 text-sm mb-3"
-                    data-ocid="numerology.error_state"
+                    className="text-xs font-body mb-3"
+                    style={{ color: "oklch(var(--destructive))" }}
                   >
-                    {error}
+                    {dobError}
                   </p>
                 )}
 
                 <Button
-                  onClick={handleCalculate}
-                  className="w-full btn-gold border-none"
-                  data-ocid="numerology.primary_button"
+                  onClick={handleShowChart}
+                  data-ocid="vedic_show_chart.primary_button"
+                  className="w-full font-body font-semibold tracking-wide"
+                  style={{
+                    background: "oklch(var(--primary))",
+                    color: "oklch(var(--primary-foreground))",
+                  }}
                 >
-                  <Calculator size={16} className="mr-2" />
-                  Calculate Chart
+                  <ChevronDown className="w-4 h-4 mr-2" /> Show Natal Chart
                 </Button>
               </div>
 
-              {/* ── Results ── */}
-              {natalData && calculatedDOB && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  {/* ── NATAL CHART ── */}
-                  <div className="bg-white/70 border-2 border-gold/40 rounded-xl p-5 mb-5 shadow-spiritual">
-                    <div className="text-center mb-4">
-                      <span className="inline-block bg-gold/15 text-gold-dark text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full">
-                        Natal Chart
-                      </span>
-                      <p className="text-sm text-charcoal/60 mt-1">
-                        {dobLabel}
-                      </p>
-                    </div>
-
-                    {/* Key Numbers Summary */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-                      {[
-                        {
-                          label: "Basic",
-                          value: natalData.basicNumber,
-                          desc: "Birth date vibration",
-                        },
-                        {
-                          label: "Month",
-                          value: natalData.monthNumber,
-                          desc: "Birth month energy",
-                        },
-                        {
-                          label: "Destiny",
-                          value: natalData.destinyNumber,
-                          desc: "Life path number",
-                        },
-                        {
-                          label: "Dasa",
-                          value: currentDasa?.dasaNumber ?? "-",
-                          desc: currentDasa
-                            ? `${currentDasa.startYear}–${currentDasa.endYear}`
-                            : "",
-                        },
-                      ].map(({ label, value, desc }) => (
-                        <div
-                          key={label}
-                          className="bg-cream-bg/80 border border-gold/20 rounded-lg p-3 text-center"
-                        >
-                          <p className="text-xs text-charcoal/50 mb-1">
-                            {label}
-                          </p>
-                          <p className="font-serif text-2xl font-bold text-gold-dark">
-                            {value}
-                          </p>
-                          <p className="text-xs text-charcoal/40 mt-0.5">
-                            {desc}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* The Grid */}
-                    <div className="flex flex-col items-center gap-4">
-                      <ChartGrid
-                        natalCounts={natalData.counts}
-                        dasaNumber={currentDasa?.dasaNumber}
-                        yearNumber={null}
-                        size="lg"
+              <AnimatePresence>
+                {result && (
+                  <motion.div
+                    key="chart-result"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                    className="mt-6 space-y-5"
+                  >
+                    <div
+                      className="rounded-lg p-4 flex items-center justify-center gap-8"
+                      style={{
+                        background: "oklch(var(--card))",
+                        border: "1px solid oklch(var(--border))",
+                      }}
+                    >
+                      <SummaryPill
+                        label="Basic"
+                        value={result.basicNumber}
+                        color="#dc2626"
                       />
+                      <div
+                        className="w-px h-8"
+                        style={{ background: "oklch(var(--border))" }}
+                      />
+                      <SummaryPill
+                        label="Destiny"
+                        value={result.destinyNumber}
+                        color="#eab308"
+                      />
+                    </div>
 
-                      {/* Legend */}
-                      <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-charcoal/60">
-                        <span className="flex items-center gap-1.5">
-                          <span className="w-3 h-3 rounded bg-charcoal inline-block" />
-                          Natal numbers
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          <span
-                            className="w-3 h-3 rounded inline-block"
+                    <div
+                      className="rounded-lg p-5"
+                      style={{
+                        background: "oklch(var(--card))",
+                        border: "1px solid oklch(var(--border))",
+                      }}
+                    >
+                      <NatalChart
+                        cellCounts={result.cellCounts}
+                        basicNumber={result.basicNumber}
+                        destinyNumber={result.destinyNumber}
+                        animate={true}
+                      />
+                    </div>
+
+                    <div
+                      className="rounded-lg p-4 space-y-4"
+                      style={{
+                        background: "oklch(var(--card))",
+                        border: "1px solid oklch(var(--border))",
+                      }}
+                    >
+                      <h3
+                        className="font-display text-base font-semibold"
+                        style={{ color: "oklch(var(--primary))" }}
+                      >
+                        Dasa &amp; Year Charts
+                      </h3>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label
+                            className="text-xs uppercase tracking-wider font-body"
+                            style={{ color: "oklch(var(--muted-foreground))" }}
+                          >
+                            From Year
+                          </Label>
+                          <Input
+                            data-ocid="vedic_year_from.input"
+                            type="number"
+                            min={1900}
+                            max={2200}
+                            value={fromYear}
+                            onChange={(e) =>
+                              setFromYear(
+                                Number.parseInt(e.target.value, 10) || fromYear,
+                              )
+                            }
+                            className="font-body"
                             style={{
-                              background: "rgba(80,80,80,0.8)",
-                              border: "1px solid white",
+                              background: "oklch(var(--input))",
+                              borderColor: "oklch(var(--border))",
                             }}
                           />
-                          Dasa (white, top-right)
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          <span
-                            className="w-3 h-3 rounded inline-block"
-                            style={{ background: "#2a9d8f" }}
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label
+                            className="text-xs uppercase tracking-wider font-body"
+                            style={{ color: "oklch(var(--muted-foreground))" }}
+                          >
+                            To Year
+                          </Label>
+                          <Input
+                            data-ocid="vedic_year_to.input"
+                            type="number"
+                            min={1900}
+                            max={2200}
+                            value={toYear}
+                            onChange={(e) =>
+                              setToYear(
+                                Number.parseInt(e.target.value, 10) || toYear,
+                              )
+                            }
+                            className="font-body"
+                            style={{
+                              background: "oklch(var(--input))",
+                              borderColor: "oklch(var(--border))",
+                            }}
                           />
-                          Year number (green, bottom-left)
-                        </span>
+                        </div>
                       </div>
+                      <Button
+                        onClick={() => setShowYearCharts((v) => !v)}
+                        data-ocid="vedic_show_year_charts.primary_button"
+                        className="w-full font-body font-semibold tracking-wide"
+                        style={{
+                          background: "oklch(var(--primary))",
+                          color: "oklch(var(--primary-foreground))",
+                        }}
+                      >
+                        {showYearCharts
+                          ? "Hide Year Charts"
+                          : "Show Year Charts"}
+                      </Button>
                     </div>
 
-                    {currentDasa && (
-                      <div className="mt-4 bg-gold/8 border border-gold/20 rounded-lg px-4 py-2.5 text-sm text-center">
-                        <span className="font-medium text-gold-dark">
-                          Current Dasa: {currentDasa.dasaNumber}
-                        </span>
-                        <span className="text-charcoal/60 ml-2">
-                          {currentDasa.startYear} – {currentDasa.endYear}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* ── DASA TIMELINE ── */}
-                  <div className="bg-white/70 border border-gold/30 rounded-xl p-5 mb-5 shadow-xs">
-                    <button
-                      type="button"
-                      className="w-full flex items-center justify-between"
-                      onClick={() => setExpandedDasa((v) => !v)}
-                      data-ocid="numerology.toggle"
-                    >
-                      <h3 className="font-serif text-base font-semibold text-gold-dark">
-                        45-Year Dasa Cycle
-                      </h3>
-                      {expandedDasa ? (
-                        <ChevronUp size={16} />
-                      ) : (
-                        <ChevronDown size={16} />
-                      )}
-                    </button>
-
                     <AnimatePresence>
-                      {expandedDasa && (
+                      {showYearCharts && (
                         <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="overflow-hidden"
+                          key="year-charts"
+                          initial={{ opacity: 0, y: 16 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.35 }}
                         >
-                          <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                            {dasaPeriods.map((p, idx) => {
-                              const isActive =
-                                currentDasa?.dasaNumber === p.dasaNumber &&
-                                currentDasa?.startYear === p.startYear;
-                              return (
-                                <div
-                                  key={`${idx}-${p.dasaNumber}-${p.startYear}`}
-                                  className={`rounded-lg px-3 py-2 text-center text-sm border ${
-                                    isActive
-                                      ? "bg-gold/20 border-gold/60 font-bold"
-                                      : "bg-cream-bg/60 border-gold/15"
-                                  }`}
-                                >
-                                  <div className="font-serif text-lg font-bold text-gold-dark">
-                                    {p.dasaNumber}
-                                  </div>
-                                  <div className="text-xs text-charcoal/50">
-                                    {p.startYear}–{p.endYear}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
+                          <YearChartGrid
+                            day={Number.parseInt(dob.day, 10)}
+                            month={Number.parseInt(dob.month, 10)}
+                            year={Number.parseInt(dob.year, 10)}
+                            basicNumber={result.basicNumber}
+                            destinyNumber={result.destinyNumber}
+                            natalCellCounts={result.cellCounts}
+                            fromYear={fromYear}
+                            toYear={toYear}
+                            canAccessMonth={sectionLevel >= 2}
+                            onMonthLocked={() => setShowMonthGate(true)}
+                          />
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </div>
 
-                  {/* ── YEAR NUMBER CHARTS ── */}
-                  <div className="bg-white/70 border border-gold/30 rounded-xl p-5 mb-5 shadow-xs">
-                    <h3 className="font-serif text-base font-semibold text-gold-dark mb-4">
-                      Year Number Charts
-                    </h3>
-
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                      <div>
-                        <Label className="text-xs text-charcoal/60 mb-1 block">
-                          From Year
-                        </Label>
-                        <Input
-                          type="number"
-                          min={1}
-                          max={9999}
-                          value={yearRangeStart}
-                          onChange={(e) => setYearRangeStart(e.target.value)}
-                          className="font-mono text-center"
-                          data-ocid="numerology.input"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-charcoal/60 mb-1 block">
-                          To Year (max +100)
-                        </Label>
-                        <Input
-                          type="number"
-                          min={1}
-                          max={9999}
-                          value={yearRangeEnd}
-                          onChange={(e) => setYearRangeEnd(e.target.value)}
-                          className="font-mono text-center"
-                          data-ocid="numerology.input"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-6">
-                      {yearCharts.length === 0 && (
-                        <p
-                          className="text-sm text-charcoal/50 text-center py-4"
-                          data-ocid="numerology.empty_state"
-                        >
-                          Enter a valid year range to see year charts.
-                        </p>
-                      )}
-                      {yearCharts.map((yc) => {
-                        const yrSpecificDasa =
-                          dasaPeriods.find(
-                            (p) =>
-                              yc.year >= p.startYear && yc.year < p.endYear,
-                          ) || null;
-
-                        return (
-                          <div
-                            key={yc.year}
-                            className="border border-gold/20 rounded-xl overflow-hidden"
-                            data-ocid="numerology.panel"
-                          >
-                            <div className="bg-gold/10 px-4 py-2 flex items-center justify-between">
-                              <div>
-                                <span className="font-bold text-gold-dark text-sm">
-                                  YEAR {yc.year}–{yc.year + 1}
-                                </span>
-                                <span className="text-xs text-charcoal/50 ml-2">
-                                  {yc.labelStart} – {yc.labelEnd}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2 text-xs">
-                                <span className="text-charcoal/50">
-                                  Year #:
-                                </span>
-                                <span
-                                  className="font-bold"
-                                  style={{ color: "#2a9d8f" }}
-                                >
-                                  {yc.yearNumber}
-                                </span>
-                                {yrSpecificDasa && (
-                                  <span className="text-charcoal/40 ml-1">
-                                    · Dasa: {yrSpecificDasa.dasaNumber}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="p-4 flex justify-center">
-                              <ChartGrid
-                                natalCounts={natalData.counts}
-                                dasaNumber={yrSpecificDasa?.dasaNumber}
-                                yearNumber={yc.yearNumber}
-                                size="sm"
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* ── SAVE CHART ── */}
-                  <div className="bg-white/60 border border-gold/20 rounded-xl p-5 mb-5">
-                    <h3 className="font-serif text-base font-semibold text-gold-dark mb-3">
+                    <Button
+                      onClick={() => setSaveDialogOpen(true)}
+                      data-ocid="vedic_save_chart.primary_button"
+                      variant="outline"
+                      className="w-full font-body font-semibold tracking-wide"
+                      style={{
+                        borderColor: "oklch(var(--primary) / 0.5)",
+                        color: "oklch(var(--primary))",
+                      }}
+                    >
                       Save This Chart
-                    </h3>
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </TabsContent>
 
-                    {!showSaveInput ? (
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowSaveInput(true)}
-                        className="border-gold/40 text-gold-dark hover:bg-gold/10"
-                        data-ocid="numerology.save_button"
-                      >
-                        <BookmarkPlus size={15} className="mr-2" />
-                        Save Chart
-                      </Button>
-                    ) : (
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Chart name (e.g. My Chart)"
-                          value={saveName}
-                          onChange={(e) => setSaveName(e.target.value)}
-                          onKeyDown={(e) => e.key === "Enter" && handleSave()}
-                          className="flex-1"
-                          data-ocid="numerology.input"
-                        />
-                        <Button
-                          onClick={handleSave}
-                          disabled={!saveName.trim()}
-                          className="btn-gold border-none"
-                          data-ocid="numerology.submit_button"
-                        >
-                          Save
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          onClick={() => {
-                            setShowSaveInput(false);
-                            setSaveName("");
-                          }}
-                          data-ocid="numerology.cancel_button"
-                        >
-                          <X size={14} />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </TabsContent>
-
-            {/* ── SAVED TAB ── */}
-            <TabsContent value="saved">
-              {savedCharts.length === 0 ? (
+          {/* Saved Charts Tab */}
+          <TabsContent value="saved" className="mt-0">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {chartsLoading ? (
                 <div
-                  className="text-center py-16"
-                  data-ocid="numerology.empty_state"
+                  data-ocid="vedic_charts.loading_state"
+                  className="space-y-3"
                 >
-                  <p className="text-4xl mb-3">📊</p>
-                  <p className="text-charcoal/60">No saved charts yet.</p>
-                  <p className="text-sm text-charcoal/40 mt-1">
-                    Calculate a chart and save it to access it later.
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton
+                      key={i}
+                      className="h-20 w-full rounded-lg"
+                      style={{ background: "oklch(var(--muted))" }}
+                    />
+                  ))}
+                </div>
+              ) : charts.length === 0 ? (
+                <div
+                  data-ocid="vedic_charts.empty_state"
+                  className="text-center py-16 space-y-3"
+                >
+                  <BookOpen
+                    className="w-12 h-12 mx-auto opacity-25"
+                    style={{ color: "oklch(var(--primary))" }}
+                  />
+                  <p
+                    className="font-display text-lg"
+                    style={{ color: "oklch(var(--muted-foreground))" }}
+                  >
+                    No saved charts yet
+                  </p>
+                  <p
+                    className="font-body text-sm"
+                    style={{ color: "oklch(var(--muted-foreground))" }}
+                  >
+                    Calculate a natal chart and save it to see it here.
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {savedCharts.map((chart, idx) => {
-                    const dobForChart = chart.dob;
-                    const chartNatal = computeNatalChart(dobForChart);
-                    const chartDasas = computeDasaTimeline(dobForChart);
-                    const chartCurrDasa = getCurrentDasa(chartDasas);
-
-                    return (
-                      <motion.div
-                        key={chart.id}
-                        className="bg-white/70 border-2 border-gold/30 rounded-xl p-5 shadow-xs"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.05 }}
-                        data-ocid={`numerology.item.${idx + 1}`}
-                      >
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <h3 className="font-serif text-lg font-bold text-gold-dark">
-                              {chart.name}
-                            </h3>
-                            <p className="text-sm text-charcoal/60">
-                              DOB: {String(chart.dob.day).padStart(2, "0")}/
-                              {String(chart.dob.month).padStart(2, "0")}/
-                              {chart.dob.year}
-                            </p>
-                            <p className="text-xs text-charcoal/40">
-                              Saved: {chart.savedAt}
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteSaved(chart.id)}
-                            className="text-red-400 hover:text-red-600 transition-colors p-1"
-                            aria-label="Delete saved chart"
-                            data-ocid="numerology.delete_button"
+                <div data-ocid="vedic_saved_charts.list" className="space-y-3">
+                  {charts.map((chart, idx) => (
+                    <motion.div
+                      key={String(chart.id)}
+                      data-ocid={`vedic_saved_chart.item.${idx + 1}`}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      onClick={() =>
+                        setSelectedSaved(
+                          selectedSaved?.id === chart.id ? null : chart,
+                        )
+                      }
+                      className="rounded-lg p-4 cursor-pointer transition-all"
+                      style={{
+                        background:
+                          selectedSaved?.id === chart.id
+                            ? "oklch(0.92 0.03 90)"
+                            : "oklch(var(--card))",
+                        border:
+                          selectedSaved?.id === chart.id
+                            ? "1px solid oklch(var(--primary) / 0.6)"
+                            : "1px solid oklch(var(--border))",
+                      }}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className="font-display font-semibold text-base truncate"
+                            style={{ color: "oklch(var(--foreground))" }}
                           >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-
-                        <div className="flex flex-col items-center gap-3">
-                          <ChartGrid
-                            natalCounts={chartNatal.counts}
-                            dasaNumber={chartCurrDasa?.dasaNumber}
-                            yearNumber={null}
-                            size="sm"
-                          />
-
-                          <div className="text-sm text-center">
-                            <span className="text-charcoal/60">Basic: </span>
-                            <span className="font-bold text-gold-dark">
-                              {chartNatal.basicNumber}
+                            {chart.name}
+                          </p>
+                          <p
+                            className="font-body text-sm mt-0.5"
+                            style={{ color: "oklch(var(--muted-foreground))" }}
+                          >
+                            {chart.dob}
+                          </p>
+                          <div className="flex gap-3 mt-1.5">
+                            <span
+                              className="font-body text-xs"
+                              style={{ color: "#dc2626" }}
+                            >
+                              Basic: {String(chart.basicNumber)}
                             </span>
-                            <span className="text-charcoal/40 mx-2">·</span>
-                            <span className="text-charcoal/60">Destiny: </span>
-                            <span className="font-bold text-gold-dark">
-                              {chartNatal.destinyNumber}
+                            <span
+                              className="font-body text-xs"
+                              style={{ color: "#eab308" }}
+                            >
+                              Destiny: {String(chart.destinyNumber)}
                             </span>
-                            {chartCurrDasa && (
-                              <>
-                                <span className="text-charcoal/40 mx-2">·</span>
-                                <span className="text-charcoal/60">Dasa: </span>
-                                <span className="font-bold text-gold-dark">
-                                  {chartCurrDasa.dasaNumber} (
-                                  {chartCurrDasa.startYear}–
-                                  {chartCurrDasa.endYear})
-                                </span>
-                              </>
-                            )}
                           </div>
                         </div>
-
-                        <Button
-                          variant="outline"
-                          className="w-full mt-3 border-gold/30 text-gold-dark hover:bg-gold/10 text-sm"
-                          onClick={() => handleLoadSaved(chart)}
-                          data-ocid="numerology.button"
+                        <button
+                          type="button"
+                          data-ocid={`vedic_delete_chart.delete_button.${idx + 1}`}
+                          onClick={(e) => handleDeleteChart(e, chart.id)}
+                          className="p-2 rounded-md transition-colors shrink-0"
+                          style={{ color: "oklch(var(--muted-foreground))" }}
+                          disabled={deleteChart.isPending}
+                          aria-label="Delete chart"
                         >
-                          Load &amp; Edit This Chart
-                        </Button>
-                      </motion.div>
-                    );
-                  })}
+                          {deleteChart.isPending &&
+                          deleteChart.variables === chart.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                      <AnimatePresence>
+                        {selectedSaved?.id === chart.id && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="overflow-hidden"
+                          >
+                            <div
+                              className="mt-4 pt-4"
+                              style={{
+                                borderTop: "1px solid oklch(var(--border))",
+                              }}
+                            >
+                              <NatalChart
+                                cellCounts={getSavedResult(chart).cellCounts}
+                                basicNumber={Number(chart.basicNumber)}
+                                destinyNumber={Number(chart.destinyNumber)}
+                                animate={false}
+                              />
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  ))}
                 </div>
               )}
-            </TabsContent>
-          </Tabs>
+            </motion.div>
+          </TabsContent>
+
+          {/* Comparison Tab */}
+          <TabsContent value="comparison" className="mt-0">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <AnimatePresence mode="wait">
+                {!showComparison ? (
+                  <motion.div
+                    key="comparison-form"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="space-y-4"
+                  >
+                    {[
+                      {
+                        label: "Person 1",
+                        dob: p1Dob,
+                        setDob: setP1Dob,
+                        ocid: "comp_p1_dob.input",
+                      },
+                      {
+                        label: "Person 2",
+                        dob: p2Dob,
+                        setDob: setP2Dob,
+                        ocid: "comp_p2_dob.input",
+                      },
+                    ].map(({ label, dob: pDob, setDob: setPDob, ocid }) => (
+                      <div
+                        key={label}
+                        className="rounded-lg p-5"
+                        style={{
+                          background: "oklch(var(--card))",
+                          border: "1px solid oklch(var(--border))",
+                        }}
+                      >
+                        <h2
+                          className="font-display text-lg font-semibold mb-4"
+                          style={{ color: "oklch(var(--primary))" }}
+                        >
+                          {label}
+                        </h2>
+                        <div className="grid grid-cols-3 gap-3">
+                          <div className="space-y-1.5">
+                            <Label
+                              className="text-xs uppercase tracking-wider font-body"
+                              style={{
+                                color: "oklch(var(--muted-foreground))",
+                              }}
+                            >
+                              Day
+                            </Label>
+                            <select
+                              data-ocid={ocid}
+                              value={pDob.day}
+                              onChange={(e) =>
+                                setPDob((prev) => ({
+                                  ...prev,
+                                  day: e.target.value,
+                                }))
+                              }
+                              className="w-full h-9 px-3 rounded-md text-sm font-body appearance-none cursor-pointer"
+                              style={{
+                                background: "oklch(var(--input))",
+                                border: "1px solid oklch(var(--border))",
+                                color: pDob.day
+                                  ? "oklch(var(--foreground))"
+                                  : "oklch(var(--muted-foreground))",
+                              }}
+                            >
+                              <option value="" disabled>
+                                DD
+                              </option>
+                              {dayOptions.map((d) => (
+                                <option key={d} value={String(d)}>
+                                  {String(d).padStart(2, "0")}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label
+                              className="text-xs uppercase tracking-wider font-body"
+                              style={{
+                                color: "oklch(var(--muted-foreground))",
+                              }}
+                            >
+                              Month
+                            </Label>
+                            <select
+                              value={pDob.month}
+                              onChange={(e) =>
+                                setPDob((prev) => ({
+                                  ...prev,
+                                  month: e.target.value,
+                                }))
+                              }
+                              className="w-full h-9 px-3 rounded-md text-sm font-body appearance-none cursor-pointer"
+                              style={{
+                                background: "oklch(var(--input))",
+                                border: "1px solid oklch(var(--border))",
+                                color: pDob.month
+                                  ? "oklch(var(--foreground))"
+                                  : "oklch(var(--muted-foreground))",
+                              }}
+                            >
+                              <option value="" disabled>
+                                MM
+                              </option>
+                              {monthOptions.map((m) => (
+                                <option key={m} value={String(m)}>
+                                  {getMonthName(m)}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label
+                              className="text-xs uppercase tracking-wider font-body"
+                              style={{
+                                color: "oklch(var(--muted-foreground))",
+                              }}
+                            >
+                              Year
+                            </Label>
+                            <YearScrollPicker
+                              value={pDob.year}
+                              onChange={(v) =>
+                                setPDob((prev) => ({ ...prev, year: v }))
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {compError && (
+                      <p
+                        className="text-xs font-body"
+                        style={{ color: "oklch(var(--destructive))" }}
+                        data-ocid="vedic_comparison.error_state"
+                      >
+                        {compError}
+                      </p>
+                    )}
+                    <Button
+                      onClick={handleShowComparison}
+                      data-ocid="vedic_comparison.primary_button"
+                      className="w-full font-body font-semibold tracking-wide"
+                      style={{
+                        background: "oklch(var(--primary))",
+                        color: "oklch(var(--primary-foreground))",
+                      }}
+                    >
+                      Compare Charts
+                    </Button>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="comparison-result"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="space-y-4"
+                  >
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowComparison(false)}
+                      data-ocid="vedic_comparison_back.secondary_button"
+                      className="font-body gap-2"
+                    >
+                      <ArrowLeft className="w-4 h-4" /> Back
+                    </Button>
+                    {p1Result && p2Result && (
+                      <div className="space-y-3">
+                        {/* Chart type tabs */}
+                        <div
+                          className="flex gap-1 rounded-lg p-1"
+                          style={{ background: "oklch(var(--muted))" }}
+                        >
+                          {(["natal", "year"] as const).map((tab) => (
+                            <button
+                              type="button"
+                              key={tab}
+                              data-ocid={`compare_chart.${tab}.tab`}
+                              onClick={() => setCompareChartTab(tab)}
+                              className="flex-1 py-1.5 rounded-md text-xs font-semibold font-body transition-all"
+                              style={{
+                                background:
+                                  compareChartTab === tab
+                                    ? "oklch(var(--card))"
+                                    : "transparent",
+                                color:
+                                  compareChartTab === tab
+                                    ? "oklch(var(--primary))"
+                                    : "oklch(var(--muted-foreground))",
+                                boxShadow:
+                                  compareChartTab === tab
+                                    ? "0 1px 3px oklch(0 0 0 / 0.1)"
+                                    : "none",
+                              }}
+                            >
+                              {tab === "natal"
+                                ? "Natal"
+                                : "Year · Month · Dasa"}
+                            </button>
+                          ))}
+                        </div>
+
+                        {compareChartTab === "natal" && (
+                          <div className="grid grid-cols-2 gap-3">
+                            {[
+                              { label: "Person 1", r: p1Result },
+                              { label: "Person 2", r: p2Result },
+                            ].map(({ label, r }) => (
+                              <div
+                                key={label}
+                                className="rounded-lg p-3 space-y-2"
+                                style={{
+                                  background: "oklch(var(--card))",
+                                  border: "1px solid oklch(var(--border))",
+                                }}
+                              >
+                                <h3
+                                  className="font-display text-sm font-semibold"
+                                  style={{ color: "oklch(var(--primary))" }}
+                                >
+                                  {label}
+                                </h3>
+                                <div className="flex gap-3">
+                                  <span
+                                    className="font-body text-xs"
+                                    style={{ color: "#dc2626" }}
+                                  >
+                                    B: {r.basicNumber}
+                                  </span>
+                                  <span
+                                    className="font-body text-xs"
+                                    style={{ color: "#eab308" }}
+                                  >
+                                    D: {r.destinyNumber}
+                                  </span>
+                                </div>
+                                <NatalChart
+                                  cellCounts={r.cellCounts}
+                                  basicNumber={r.basicNumber}
+                                  destinyNumber={r.destinyNumber}
+                                  animate={false}
+                                  compact={true}
+                                  hideHeader={true}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {compareChartTab === "year" && (
+                          <div className="space-y-6">
+                            {[
+                              { label: "Person 1", r: p1Result, dob: p1Dob },
+                              { label: "Person 2", r: p2Result, dob: p2Dob },
+                            ].map(({ label, r, dob }) => (
+                              <div key={label} className="space-y-2">
+                                <h3
+                                  className="font-display text-sm font-semibold px-1"
+                                  style={{ color: "oklch(var(--primary))" }}
+                                >
+                                  {label} — B: {r.basicNumber} · D:{" "}
+                                  {r.destinyNumber}
+                                </h3>
+                                <YearChartGrid
+                                  day={Number.parseInt(dob.day, 10)}
+                                  month={Number.parseInt(dob.month, 10)}
+                                  year={Number.parseInt(dob.year, 10)}
+                                  basicNumber={r.basicNumber}
+                                  destinyNumber={r.destinyNumber}
+                                  natalCellCounts={r.cellCounts}
+                                  fromYear={new Date().getFullYear()}
+                                  toYear={new Date().getFullYear() + 5}
+                                  canAccessMonth={true}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </TabsContent>
+
+          {/* Month/Days Tab */}
+          <TabsContent value="monthdays" className="mt-0">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div
+                className="rounded-lg p-5 space-y-4"
+                style={{
+                  background: "oklch(var(--card))",
+                  border: "1px solid oklch(var(--border))",
+                }}
+              >
+                <h2
+                  className="font-display text-lg font-semibold"
+                  style={{ color: "oklch(var(--primary))" }}
+                >
+                  Month &amp; Day Charts
+                </h2>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-1.5">
+                    <Label
+                      className="text-xs uppercase tracking-wider font-body"
+                      style={{ color: "oklch(var(--muted-foreground))" }}
+                    >
+                      Day
+                    </Label>
+                    <select
+                      data-ocid="vedic_md_dob_day.input"
+                      value={dobMD.day}
+                      onChange={(e) =>
+                        setDobMD((prev) => ({ ...prev, day: e.target.value }))
+                      }
+                      className="w-full h-9 px-3 rounded-md text-sm font-body appearance-none cursor-pointer"
+                      style={{
+                        background: "oklch(var(--input))",
+                        border: "1px solid oklch(var(--border))",
+                        color: dobMD.day
+                          ? "oklch(var(--foreground))"
+                          : "oklch(var(--muted-foreground))",
+                      }}
+                    >
+                      <option value="" disabled>
+                        DD
+                      </option>
+                      {dayOptions.map((d) => (
+                        <option key={d} value={String(d)}>
+                          {String(d).padStart(2, "0")}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label
+                      className="text-xs uppercase tracking-wider font-body"
+                      style={{ color: "oklch(var(--muted-foreground))" }}
+                    >
+                      Month
+                    </Label>
+                    <select
+                      value={dobMD.month}
+                      onChange={(e) =>
+                        setDobMD((prev) => ({ ...prev, month: e.target.value }))
+                      }
+                      className="w-full h-9 px-3 rounded-md text-sm font-body appearance-none cursor-pointer"
+                      style={{
+                        background: "oklch(var(--input))",
+                        border: "1px solid oklch(var(--border))",
+                        color: dobMD.month
+                          ? "oklch(var(--foreground))"
+                          : "oklch(var(--muted-foreground))",
+                      }}
+                    >
+                      <option value="" disabled>
+                        MM
+                      </option>
+                      {monthOptions.map((m) => (
+                        <option key={m} value={String(m)}>
+                          {getMonthName(m)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label
+                      className="text-xs uppercase tracking-wider font-body"
+                      style={{ color: "oklch(var(--muted-foreground))" }}
+                    >
+                      Year
+                    </Label>
+                    <YearScrollPicker
+                      value={dobMD.year}
+                      onChange={(v) =>
+                        setDobMD((prev) => ({ ...prev, year: v }))
+                      }
+                    />
+                  </div>
+                </div>
+                {dobMDError && (
+                  <p
+                    className="text-xs font-body"
+                    style={{ color: "oklch(var(--destructive))" }}
+                  >
+                    {dobMDError}
+                  </p>
+                )}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label
+                      className="text-xs uppercase tracking-wider font-body"
+                      style={{ color: "oklch(var(--muted-foreground))" }}
+                    >
+                      From Year
+                    </Label>
+                    <Input
+                      type="number"
+                      min={1900}
+                      max={2200}
+                      value={fromYearMD}
+                      onChange={(e) =>
+                        setFromYearMD(
+                          Number.parseInt(e.target.value, 10) || fromYearMD,
+                        )
+                      }
+                      className="font-body"
+                      style={{
+                        background: "oklch(var(--input))",
+                        borderColor: "oklch(var(--border))",
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label
+                      className="text-xs uppercase tracking-wider font-body"
+                      style={{ color: "oklch(var(--muted-foreground))" }}
+                    >
+                      To Year
+                    </Label>
+                    <Input
+                      type="number"
+                      min={1900}
+                      max={2200}
+                      value={toYearMD}
+                      onChange={(e) =>
+                        setToYearMD(
+                          Number.parseInt(e.target.value, 10) || toYearMD,
+                        )
+                      }
+                      className="font-body"
+                      style={{
+                        background: "oklch(var(--input))",
+                        borderColor: "oklch(var(--border))",
+                      }}
+                    />
+                  </div>
+                </div>
+                <Button
+                  data-ocid="vedic_md_show.primary_button"
+                  onClick={() => {
+                    const day = Number.parseInt(dobMD.day, 10);
+                    const month = Number.parseInt(dobMD.month, 10);
+                    const year = Number.parseInt(dobMD.year, 10);
+                    if (!dobMD.day || !dobMD.month || !dobMD.year) {
+                      setDobMDError("Please select a complete date of birth.");
+                      return;
+                    }
+                    const err = validateDOB(day, month, year);
+                    if (err) {
+                      setDobMDError(err);
+                      return;
+                    }
+                    setDobMDError("");
+                    setResultMD(
+                      calculateNumerology(formatDOB(day, month, year)),
+                    );
+                    setShowYearChartsMD(true);
+                  }}
+                  className="w-full font-body font-semibold tracking-wide"
+                  style={{
+                    background: "oklch(var(--primary))",
+                    color: "oklch(var(--primary-foreground))",
+                  }}
+                >
+                  Show Year Charts
+                </Button>
+              </div>
+
+              {showYearChartsMD && resultMD && (
+                <div className="mt-4">
+                  <YearChartGrid
+                    day={Number.parseInt(dobMD.day, 10)}
+                    month={Number.parseInt(dobMD.month, 10)}
+                    year={Number.parseInt(dobMD.year, 10)}
+                    basicNumber={resultMD.basicNumber}
+                    destinyNumber={resultMD.destinyNumber}
+                    natalCellCounts={resultMD.cellCounts}
+                    fromYear={fromYearMD}
+                    toYear={toYearMD}
+                    canAccessMonth={sectionLevel >= 2}
+                    onMonthLocked={() => setShowMonthGate(true)}
+                  />
+                </div>
+              )}
+            </motion.div>
+          </TabsContent>
+
+          {/* Predictions Tab */}
+          <TabsContent value="predictions" className="mt-0">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {result ? (
+                <PredictionPanel
+                  cellCounts={result.cellCounts}
+                  basicNumber={result.basicNumber}
+                  destinyNumber={result.destinyNumber}
+                />
+              ) : (
+                <div
+                  className="text-center py-16 space-y-3"
+                  data-ocid="vedic_predictions.empty_state"
+                >
+                  <Sparkles
+                    className="w-12 h-12 mx-auto opacity-25"
+                    style={{ color: "oklch(var(--primary))" }}
+                  />
+                  <p
+                    className="font-display text-lg"
+                    style={{ color: "oklch(var(--muted-foreground))" }}
+                  >
+                    Generate a chart first
+                  </p>
+                  <p
+                    className="font-body text-sm"
+                    style={{ color: "oklch(var(--muted-foreground))" }}
+                  >
+                    Go to the New tab and enter a date of birth.
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          </TabsContent>
+        </Tabs>
+      </main>
+
+      {/* Month gate toast */}
+      {showMonthGate && (
+        <div
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 rounded-xl p-4 shadow-xl max-w-sm w-full mx-4 space-y-3"
+          style={{
+            background: "oklch(var(--card))",
+            border: "1px solid oklch(var(--border))",
+          }}
+          data-ocid="vedic_month_gate.card"
+        >
+          <div className="flex items-center gap-2">
+            <Lock
+              className="w-4 h-4 shrink-0"
+              style={{ color: "oklch(var(--primary))" }}
+            />
+            <p
+              className="font-body text-sm font-semibold"
+              style={{ color: "oklch(var(--foreground))" }}
+            >
+              Month charts require Paid access
+            </p>
+          </div>
+          <p
+            className="font-body text-xs"
+            style={{ color: "oklch(var(--muted-foreground))" }}
+          >
+            Log in with a Paid or Advanced account to unlock month and day
+            charts.
+          </p>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              onClick={() => {
+                setShowMonthGate(false);
+                openLoginModal(false);
+              }}
+              data-ocid="vedic_month_gate_login.primary_button"
+              className="flex-1 font-body font-semibold text-xs"
+              style={{
+                background: "oklch(var(--primary))",
+                color: "oklch(var(--primary-foreground))",
+              }}
+            >
+              <LogIn className="w-3.5 h-3.5 mr-1.5" /> Login
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowMonthGate(false)}
+              data-ocid="vedic_month_gate.cancel_button"
+              className="font-body text-xs"
+            >
+              Dismiss
+            </Button>
+          </div>
         </div>
-      </motion.div>
-    </AnimatePresence>
+      )}
+
+      {/* Save Chart Dialog */}
+      <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
+        <DialogContent
+          data-ocid="vedic_save_chart.dialog"
+          style={{
+            background: "oklch(var(--card))",
+            border: "1px solid oklch(var(--border))",
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle
+              className="font-display"
+              style={{ color: "oklch(var(--primary))" }}
+            >
+              Save Chart
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <Label
+              className="text-xs uppercase tracking-wider font-body"
+              style={{ color: "oklch(var(--muted-foreground))" }}
+            >
+              Name
+            </Label>
+            <Input
+              data-ocid="vedic_save_chart_name.input"
+              value={saveName}
+              onChange={(e) => setSaveName(e.target.value)}
+              placeholder="e.g. John Doe"
+              onKeyDown={(e) => e.key === "Enter" && handleSaveConfirm()}
+              className="font-body"
+              style={{
+                background: "oklch(var(--input))",
+                borderColor: "oklch(var(--border))",
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setSaveDialogOpen(false)}
+              data-ocid="vedic_save_chart.cancel_button"
+              className="font-body"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveConfirm}
+              disabled={!saveName.trim() || createChart.isPending}
+              data-ocid="vedic_save_chart.confirm_button"
+              className="font-body font-semibold"
+              style={{
+                background: "oklch(var(--primary))",
+                color: "oklch(var(--primary-foreground))",
+              }}
+            >
+              {createChart.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "Save"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Login Dialog */}
+      <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
+        <DialogContent
+          data-ocid="vedic_login.dialog"
+          style={{
+            background: "oklch(var(--card))",
+            border: "1px solid oklch(var(--border))",
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle
+              className="font-display"
+              style={{ color: "oklch(var(--primary))" }}
+            >
+              {loginIsAdmin ? "Admin Login" : "User Login"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label
+                className="text-xs uppercase tracking-wider font-body"
+                style={{ color: "oklch(var(--muted-foreground))" }}
+              >
+                {loginIsAdmin ? "Email" : "Username"}
+              </Label>
+              <Input
+                data-ocid="vedic_login_username.input"
+                value={loginUsername}
+                onChange={(e) => setLoginUsername(e.target.value)}
+                placeholder={loginIsAdmin ? "admin@email.com" : "username"}
+                className="font-body"
+                style={{
+                  background: "oklch(var(--input))",
+                  borderColor: "oklch(var(--border))",
+                }}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label
+                className="text-xs uppercase tracking-wider font-body"
+                style={{ color: "oklch(var(--muted-foreground))" }}
+              >
+                Password
+              </Label>
+              <Input
+                data-ocid="vedic_login_password.input"
+                type="password"
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                placeholder="Password"
+                onKeyDown={(e) => e.key === "Enter" && handleLoginSubmit()}
+                className="font-body"
+                style={{
+                  background: "oklch(var(--input))",
+                  borderColor: "oklch(var(--border))",
+                }}
+              />
+            </div>
+            {loginError && (
+              <p
+                className="text-xs font-body"
+                style={{ color: "oklch(var(--destructive))" }}
+              >
+                {loginError}
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setLoginOpen(false)}
+              data-ocid="vedic_login.cancel_button"
+              className="font-body"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleLoginSubmit}
+              disabled={loginUser.isPending}
+              data-ocid="vedic_login.submit_button"
+              className="font-body font-semibold"
+              style={{
+                background: "oklch(var(--primary))",
+                color: "oklch(var(--primary-foreground))",
+              }}
+            >
+              {loginUser.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "Login"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
