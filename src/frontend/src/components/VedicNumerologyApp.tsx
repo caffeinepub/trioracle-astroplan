@@ -20,7 +20,6 @@ import {
   LogIn,
   LogOut,
   Settings,
-  Sparkles,
   Stars,
   Trash2,
 } from "lucide-react";
@@ -43,7 +42,6 @@ import {
   validateDOB,
 } from "../utils/numerology";
 import { NatalChart } from "./NatalChart";
-import PredictionPanel from "./PredictionPanel";
 import { VedicAdminPanel } from "./VedicAdminPanel";
 import { YearChartGrid } from "./YearChartGrid";
 import { YearScrollPicker } from "./YearScrollPicker";
@@ -440,13 +438,6 @@ function AppInner({ onClose }: { onClose?: () => void }) {
               className="flex-1 font-body data-[state=active]:font-semibold px-1"
             >
               Months
-            </TabsTrigger>
-            <TabsTrigger
-              value="predictions"
-              data-ocid="vedic_predictions_tab.tab"
-              className="flex-1 font-body data-[state=active]:font-semibold px-1"
-            >
-              Predict
             </TabsTrigger>
           </TabsList>
 
@@ -1384,45 +1375,6 @@ function AppInner({ onClose }: { onClose?: () => void }) {
                     canAccessMonth={sectionLevel >= 2}
                     onMonthLocked={() => setShowMonthGate(true)}
                   />
-                </div>
-              )}
-            </motion.div>
-          </TabsContent>
-
-          {/* Predictions Tab */}
-          <TabsContent value="predictions" className="mt-0">
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              {result ? (
-                <PredictionPanel
-                  cellCounts={result.cellCounts}
-                  basicNumber={result.basicNumber}
-                  destinyNumber={result.destinyNumber}
-                />
-              ) : (
-                <div
-                  className="text-center py-16 space-y-3"
-                  data-ocid="vedic_predictions.empty_state"
-                >
-                  <Sparkles
-                    className="w-12 h-12 mx-auto opacity-25"
-                    style={{ color: "oklch(var(--primary))" }}
-                  />
-                  <p
-                    className="font-display text-lg"
-                    style={{ color: "oklch(var(--muted-foreground))" }}
-                  >
-                    Generate a chart first
-                  </p>
-                  <p
-                    className="font-body text-sm"
-                    style={{ color: "oklch(var(--muted-foreground))" }}
-                  >
-                    Go to the New tab and enter a date of birth.
-                  </p>
                 </div>
               )}
             </motion.div>
